@@ -1,15 +1,15 @@
 # Competitive Altruism Power Analysis
 
-##Instructions for power analysis
+## Instructions for power analysis
 
 The power analysis should help us to predict whether differences between dyadic and triadic offers are significantly reliable as a function of:
 
 * the number of trials administered
 * the number of individuals (and formed triads) that participate
 
-##Expectations:
+## Expectations:
 
-###Individuals 
+### Individuals 
 
 We will conduct this power analysis only for the A chimpanzee group.
 I expect to test 6 chimpanzees (minimum expected to start study is 3, realistic maximum is 8).
@@ -24,7 +24,7 @@ Taking 6 individuals and 6 dyads as the most common outcome, I will perform a to
 Each triad will participate in 16 sessions (128 trials).
 Each session will present 8 consecutive or simultaneous trials.
 
-###Variables
+### Variables
 
 **Dyadic/Triadic condition**. Each triad will participate in 8 triadic sessions and in 8 dyadic sessions. We will alternate each type of session until we complete the 16 sessions.
   During triadic sessions the two proposers will make an offer to a responder.
@@ -39,12 +39,12 @@ Each session will present 8 consecutive or simultaneous trials.
   ABC design to test whether changes of partner (proposer and responder), affects individuals' strategies. 
   
   
-  Alternative to also assess: It would be nice if we could manipulate whether only proposer changes and only responder changes. For example, with 6 individuals there would be 4 proposers and 2 responders so that each proposer can be tested with different responder only, different proposer only or both different (e.g. A prop, B prop, C resp/ A prop, E prop, C resp/ A prop B prop F resp and A prop, D prop and F resp). This will create a total of 8 distinct triads. 
+  ***Alternative to also assess: It would be nice if we could manipulate whether only proposer changes and only responder changes. For example, with 6 individuals there would        be 4 proposers and 2 responders so that each proposer can be tested with different responder only, different proposer only or both different (e.g. A prop, B prop, C resp/      A prop, E prop, C resp/ A prop B prop F resp and A prop, D prop and F resp). This will create a total of 8 distinct triads.*** 
 
-###Parameters to introduce
+### Parameters to introduce
 
 **Dyadic/Triadic condition** 
-  In dyadic trials I expect individuals to behave as rational maximizers given previous studies in this population (Jensen et al 2007, Kaiser et al., 2012). For instance, in Jensen et al 2007 chimpanzees offered 8 for self and 2 for partner in 54% of trials when alternative as 10 for self and 0 for partner. In Bueno-Guerra et al., 2019 chimpanzees prefer to maximize 6 for self and 0 for partne over 5 for self and 3 for partner in 70% of trials.
+  In dyadic trials I expect individuals to behave as rational maximizers given previous studies in this population (Jensen et al 2007, Kaiser et al., 2012). For instance, in     Jensen et al 2007 chimpanzees offered 8 for self and 2 for partner in 54% of trials when alternative as 10 for self and 0 for partner. In Bueno-Guerra et al., 2019             chimpanzees prefer to maximize 6 for self and 0 for partne over 5 for self and 3 for partner in 70% of trials.
   
   Therefore, the expectation is that in a free-choice paradigm in which proposers can choose between 0 and 8 rewards for their partners, chimpanzees will tend to maximize.
   In dyadic trials we expect a mean offer of 1.2 offer with a SD of 0.4 (95% of data between 0.4 and 2).
@@ -58,7 +58,7 @@ Each session will present 8 consecutive or simultaneous trials.
  In simultaneous trials we expect a mean offer of 4 with a SD of 1.5 (955 of data between 1 and 7)
  
  **Experience**
- We expect a mild effect of experience. In general chimpanzees change their strategies with time. They learn the strategies of the games (e.g. Sanchez-Amaro et al., 2016, 2017). However, in a recent pure-coordination task chimpanzees chimpanzees learned how to coordinate, but they did not improve coordination across partners (Duguid et al., 2020). Still, I expect a small increase in the average offers across partner due to the competitive nature of the design.
+ We expect a mild effect of experience. In general chimpanzees change their strategies with time. They learn the strategies of the games (e.g. Sanchez-Amaro et al., 2016,        2017). However, in a recent pure-coordination task chimpanzees chimpanzees learned how to coordinate, but they did not improve coordination across partners (Duguid et al.,      2020). Still, I expect a small increase in the average offers across partner due to the competitive nature of the design.
  Across triads (and only within triadic situation) I expect an increase of 1 offer, maintaining the same SD. I do not expect increases in offers between dyadic pairs.
  
  **interaction dyadic/triadic and experience**
