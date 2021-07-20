@@ -20,7 +20,7 @@ If 6 individuals participate, I expect to create 6 unique triads. The idea is th
 If 4 individuals participate, I will try to create 4 unique triads so that each individual can still participate twice as proposer and once as responder.
 
 
-Taking 6 individuals and 6 dyads as the most common outcome, I will perform a total of 768 trials.
+Taking 6 individuals and 6 tryads as the most common outcome, I will perform a total of 768 trials.
 Each triad will participate in 16 sessions (128 trials).
 Each session will present 8 consecutive or simultaneous trials.
 
