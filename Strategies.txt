@@ -1,4 +1,4 @@
-Strategies
+Theoretical strategies for UG
 
 UG one proposer/one responder strategies:
 
@@ -7,9 +7,11 @@ UG one proposer/one responder strategies:
 * RANDOM: Strategy of random behavior in which both proposers and responders engage in no dyadic strategy (offers from 0 to 9 for proposer, equal likelihood of acceptance or rejection for responder).
 * FAIRNESS: Strategy of fairness predicts proposer to offer a fair share fo the rewards—the equal split of the pie between proposer and responder. Responder should accept the offer. In the UG dilemma presented, proposer offers 5 and responder accepts 5.
 
-UG two proposers/one responder
+UG two proposers/one responder:
 
-Subset of three strategies in which each individual acts as if they were only playing with the responder, that is RATIONAL, FAIRNESS and RANDOM.
+Subset of three strategies in which each individual acts as if they were only playing with the responder:
+
+that is RATIONAL, FAIRNESS and RANDOM.
 
 Subset of strategies in which one proposer decisions is affected by the acceptance likelihood of the other proposers offer:
 
