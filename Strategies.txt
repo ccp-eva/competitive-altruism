@@ -1,16 +1,22 @@
-Strategies*
-UG one proposer/one responder 
+Strategies
+
+UG one proposer/one responder strategies:
+
 * RATIONAL: Strategy of rational maximizer predicts proposer to maximize income and responder to accept any positive value over zero. In the UG dilemma presented, that is proposer to keep 7 and responder to accept 1. 
 * LEARNING: Strategy of rational maximizers with learning if responder rejects unfair offers> the responder may reject uncertain offers up to a threshold of acceptance. Over time, the proposer should increase her offers up to the new threshold. 
-* RANDOM: Strategy of random behavior in which both proposers and responders engage in any dyadic strategy (offers from 0 to 9 for proposer, equal likelihood of acceptance or rejection for responder).
-* FAIRNESS: Strategy of fairness predicts proposer to offer a fair share fo the rewards—the equal split of the pie between proposer and responder. Responder should accept the offer. In the UG dilemma presented, proposer offers 5 and responder accepts 5.
+* RANDOM: Strategy of random behavior in which both proposers and responders engage in no dyadic strategy (offers from 0 to 9 for proposer, equal likelihood of acceptance or rejection for responder).
+* FAIRNESS: Strategy of fairness predicts proposer to offer a fair share fo the rewardsâ€”the equal split of the pie between proposer and responder. Responder should accept the offer. In the UG dilemma presented, proposer offers 5 and responder accepts 5.
 
 UG two proposers/one responder
-Subset of three strategies in which each individual acts as if they were only playing with the responder, that is RATIONAL, FAIRNESS and RANDOM.
-Subset of strategies in which one proposer decisions is affected by the acceptance likelihood of the other proposers offer.
-* WIN STAYS, LOSE TOPS PRIOR (adaptation win stay/lose shift): strategy in which proposer keeps the same offer unless she loses. If so, proposer should at least top the prior winning offer. To keep it realistic based on chimpanzees earlier studies, initially this strategy should be as RATIONAL. If both proposers engage in this strategy, they should engage in competitive altruism, increasing their offers within and/or between sessions. This strategy is similar to LEARNING in the dyadic scenario. They inevitably deviate from RATIONAL strategy since responder can only accept one of the two offers.
-* IN SEQUENTIAL GAME: +1 STRATEGY: strategy in which the second proposer increases by one the previous proposer choice. This may be adaptive provided the responder only accepts one of the two strategies and, in theory, will tend to maximize.
-* TIT FOR TAT: strategy in which proposer A imitates previous proposer B decision. I also assume the first round is RATIONAL.  This is an adapted strategy from Prisoner’s Dilemma. It may make less sense in an UG.
-* OVER ALTRUISTIC: strategy in which proposer makes a very altruistic offer at the beginning to win the acceptance of the responder (any between equal split and the whole pie). This might allow the proposer to win for several rounds provided the responder values the first movement and does not maximize trial-by-trial. In a sequential game it may also serve as a signal of honest altruism from the first proposer—regardless whether the second proposer tops it.
 
-*in black more realistic strategies
+Subset of three strategies in which each individual acts as if they were only playing with the responder, that is RATIONAL, FAIRNESS and RANDOM.
+
+Subset of strategies in which one proposer decisions is affected by the acceptance likelihood of the other proposers offer:
+
+* WIN STAYS, LOSE TOPS PRIOR OFFER (adaptation of win stay/lose shift Prisoner Dilemma strategy): strategy in which proposer keeps the same offer unless she loses. If so, proposer should at least top the prior winning offer made by the opponent proposer. To keep it realistic based on chimpanzees earlier studies, initially this strategy should be seen as RATIONAL. If both proposers engage in this strategy, they should engage in competitive altruism, increasing their offers within and/or between sessions. This strategy is similar to LEARNING in the dyadic scenario. They inevitably deviate from RATIONAL strategy since responder can only accept one of the two offers.
+
+* IN SEQUENTIAL GAME: +1 STRATEGY: strategy in which the second proposer increases by one the previous proposer choice. This may be adaptive provided the responder only accepts one of the two strategies and, in theory, will tend to maximize.
+* TIT FOR TAT: strategy in which proposer A imitates previous proposer B decision. I also assume the first round is RATIONAL.  This is an adapted strategy from Prisonerâ€™s Dilemma. It may make less sense in an UG.
+* OVER ALTRUISTIC: strategy in which proposer makes a very altruistic offer at the beginning to win the acceptance of the responder (any between equal split and the whole pie). This might allow the proposer to win for several rounds provided the responder values the first movement and does not maximize trial-by-trial. In a sequential game it may also serve as a signal of honest altruism from the first proposerâ€”regardless whether the second proposer tops it.
+
+
