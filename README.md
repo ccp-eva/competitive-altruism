@@ -72,10 +72,4 @@ Each session will present 8 consecutive or simultaneous trials.
  **I would also like to know the same type of information if instead of e.g. 6 indviduals exchanging roles across sessions, only 4 of 6 change as proposers and the other two are responders (the alternative above). 
   
   
-  
-  
 
-
-
-
-dummy change
