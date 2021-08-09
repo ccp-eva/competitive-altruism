@@ -4,3 +4,5 @@ Not sure if it will be of much help but this four studies are the best I found a
 
 In Fischbacher, the multi proposer condition is PC2, the other conditions involve multi responder with one proposer.
 The stats of the studies are quite simple (Wilcox, t-tests, etc) but I guess the main difference is that while in the chimpanzee study there are repeated observations, in these papers that is almost never the case (with the exception of the first Otto study)
+
+Preprint advance stats. Barclay and Willer first competitive altruism test idea with humans, use of Prisoner Dilemma though.
