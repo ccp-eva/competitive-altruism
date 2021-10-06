@@ -1,0 +1,28 @@
+Model descriptions
+
+Summary: 
+Due to the impossibility to analyze the data using a binomial or a poisson model, we cannot analyze the data trial by trial. 
+We will instead use a beta distribution model and work with proportions. That is, we will proccess the data so that we obtain a single score per session (game) of eight trials (rounds)
+
+
+Models for actors (apes offering grapes):
+
+Model 1: Proportion of trials that a subject increases her offer compared to the previous trial within a session. That is, in how many trials out of 7 is the actor increasing her offer.
+The issue is that the increase may only happen between sessions and we may lose that information.
+
+Model 2: Another strategy is to model the proportion of grapes the actors sends to the responder. An increase between sessions should be captured that way. This also allows us to work with 64 grapes instead of 7 trials.
+The main issue is that offers are treated as independent between actors, and they might not be in reality since they influence each other. Still, an increase in tryadic scenario could be seen as a proxy of the effect of the partner presence.
+
+Model 1 and 2 can be easily used to compared dyadic vs tryadic situations. Besides,
+
+Model 3: Proportion of trials that a subject increases her offer compared to the partner. This is only relevant for tryadic scenario where the partner offers as well. for tryadic situations is the one in which we model whether the actors increases her offer in relation to the previous choice of the partner. This may tell us whether the consciously try to
+outcompete their partner.
+
+
+Models for responder (ape accepting grapes):
+
+Model 4: Proportion of grapes the responder gets. Is a model that is easily comparable between dyadic and tryadic scenarios. Similar in structure to model 2 with the exception that responders decisions are independent on each round. With actors, responses might not be totally independent since they may be affected by the previous offers of the partner
+(although to be honest, responder decisions could also be affected by previous offers as well, eg., I am accepting your offer finally after you have been nice for some rounds, but it is harder to proof).
+
+Model 5: Finally, as a checking, we could model the proportion of trials in which an individual responder accepts the higher offer. 
+This would allow us to control whether they are actually maximizing their outcomes. However, this is only relevant for the tryadic scenario.
