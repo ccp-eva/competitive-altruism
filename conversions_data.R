@@ -8,6 +8,8 @@ xdata<- competitive_altruism_dataset
 
 library(dplyr)
 
+##model 1
+
 
 #dyadic data left offer
 xdata_d<-subset(xdata,condition_tri_di=="dyadic")
@@ -31,7 +33,7 @@ data_d_r<-xdata_d_r%>%group_by(dyad,proposer_right,condition_tri_di,session)%>%
   summarise(offer_right = ((sum(offer_right)/32)))
 
 
-#triadic data right offer
+#triadic data left offer
 
 xdata_t<-subset(xdata,condition_tri_di=="triadic")
 xdata_t_l<-subset(xdata_t, offer_left!="na")
@@ -54,6 +56,12 @@ data_t_r<-xdata_t_r%>%group_by(dyad,proposer_right,condition_tri_di,session)%>%
   
   
 
+
+
+
+######model 2
+
+#simultaneous
 
 #triadic simultaneous left offer
 
@@ -78,8 +86,7 @@ xdata_t_r_sim$offer_right<-as.numeric(as.character(xdata_t_r_sim$offer_right))
 data_t_r_sim<-xdata_t_r_sim%>%group_by(dyad,proposer_right,type_trial,session)%>% 
   summarise(offer_right = ((sum(offer_right)/32)))
 
-
-
+#consecutive
 
 
 #triadic consec left offer FIRST
@@ -131,6 +138,83 @@ xdata_t_r_cons_sec$offer_left<-as.numeric(as.character(xdata_t_r_cons_sec$offer_
 
 data_t_r_cons_sec<-xdata_t_r_cons_sec%>%group_by(dyad,proposer_L,type_trial,session)%>% 
   summarise(offer_left = ((sum(offer_left)/16)))
+
+
+
+
+
+
+#####information for model 2 (updated)BASED ON FIRST HALF OF DATA
+
+##simultaneous data
+#triadic simultaneous left
+
+xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
+xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
+
+xdata_triadic_first_half_left<-subset(xdata_triadic_first_half, offer_left!="na")
+xdata_triadic_first_half_left_sim<-subset(xdata_triadic_first_half_left, type_trial=="simultaneous")
+
+
+xdata_triadic_first_half_left_sim$offer_left<-as.numeric(as.character(xdata_triadic_first_half_left_sim$offer_left))
+
+triadic_first_half_left_sim<-xdata_triadic_first_half_left_sim%>%group_by(dyad,proposer_L,type_trial,session)%>% 
+  summarise(offer_left = ((sum(offer_left)/32)))
+
+#triadic simultaneous right
+
+xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
+xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
+
+xdata_triadic_first_half_right<-subset(xdata_triadic_first_half,offer_right!="na")
+xdata_triadic_first_half_right_sim<-subset(xdata_triadic_first_half_right, type_trial=="simultaneous")
+
+
+xdata_triadic_first_half_right_sim$offer_right<-as.numeric(as.character(xdata_triadic_first_half_right_sim$offer_right))
+
+triadic_first_half_right_sim<-xdata_triadic_first_half_right_sim%>%group_by(dyad,proposer_right,type_trial,session)%>% 
+  summarise(offer_right = ((sum(offer_right)/32)))
+
+
+##consecutive data
+#triadic consecutive left first proposer
+
+
+
+xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
+xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
+
+
+xdata_t_l_cons_first_1half<-subset(xdata_triadic_first_half, offer_left!="na")
+xdata_t_l_cons_first_1half<-subset(xdata_t_l_cons_first_1half, type_trial=="cons_left")
+
+xdata_t_l_cons_first_1half$offer_left<-as.numeric(as.character(xdata_t_l_cons_first_1half$offer_left))
+
+data_t_l_cons_first_1half<-xdata_t_l_cons_first_1half%>%group_by(dyad,proposer_L,type_trial,session)%>% 
+  summarise(offer_left = ((sum(offer_left)/16)))
+
+
+
+
+
+#triadic consecutive right first proposer
+
+
+
+xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
+xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
+
+
+xdata_t_r_cons_first_1half<-subset(xdata_triadic_first_half, offer_right!="na")
+xdata_t_r_cons_first_1half<-subset(xdata_t_r_cons_first_1half, type_trial=="cons_right")
+
+xdata_t_r_cons_first_1half$offer_right<-as.numeric(as.character(xdata_t_r_cons_first_1half$offer_right))
+
+data_t_r_cons_first_1half<-xdata_t_r_cons_first_1half%>%group_by(dyad,proposer_right,type_trial,session)%>% 
+  summarise(offer_right = ((sum(offer_right)/16)))
+
+
+
 
 
 
