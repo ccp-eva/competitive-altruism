@@ -179,17 +179,11 @@ triadic_first_half_right_sim<-xdata_triadic_first_half_right_sim%>%group_by(dyad
 ##consecutive data
 #triadic consecutive left first proposer
 
-
-
 xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
 xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
-
-
 xdata_t_l_cons_first_1half<-subset(xdata_triadic_first_half, offer_left!="na")
 xdata_t_l_cons_first_1half<-subset(xdata_t_l_cons_first_1half, type_trial=="cons_left")
-
 xdata_t_l_cons_first_1half$offer_left<-as.numeric(as.character(xdata_t_l_cons_first_1half$offer_left))
-
 data_t_l_cons_first_1half<-xdata_t_l_cons_first_1half%>%group_by(dyad,proposer_L,type_trial,session)%>% 
   summarise(offer_left = ((sum(offer_left)/16)))
 
@@ -199,21 +193,38 @@ data_t_l_cons_first_1half<-xdata_t_l_cons_first_1half%>%group_by(dyad,proposer_L
 
 #triadic consecutive right first proposer
 
-
-
 xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
 xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
-
-
 xdata_t_r_cons_first_1half<-subset(xdata_triadic_first_half, offer_right!="na")
 xdata_t_r_cons_first_1half<-subset(xdata_t_r_cons_first_1half, type_trial=="cons_right")
-
 xdata_t_r_cons_first_1half$offer_right<-as.numeric(as.character(xdata_t_r_cons_first_1half$offer_right))
-
 data_t_r_cons_first_1half<-xdata_t_r_cons_first_1half%>%group_by(dyad,proposer_right,type_trial,session)%>% 
   summarise(offer_right = ((sum(offer_right)/16)))
 
 
+
+#triadic consecutive left second proposer
+
+xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
+xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
+xdata_t_l_cons_sec_1half<-subset(xdata_triadic_first_half, offer_right!="na")
+xdata_t_l_cons_sec_1half<-subset(xdata_t_l_cons_sec_1half, type_trial=="cons_left")
+
+xdata_t_l_cons_sec_1half$offer_right<-as.numeric(as.character(xdata_t_l_cons_sec_1half$offer_right))
+data_t_l_cons_sec_1half<-xdata_t_l_cons_sec_1half%>%group_by(dyad,proposer_right,type_trial,session)%>% 
+  summarise(offer_right = ((sum(offer_right)/16)))
+
+
+#triadic consecutive right second proposer
+
+xdata_triadic_first_half<-subset(xdata, condition_tri_di=="triadic")
+xdata_triadic_first_half<-subset(xdata_triadic_first_half, trial<5)
+xdata_t_r_cons_sec_1half<-subset(xdata_triadic_first_half, offer_left!="na")
+xdata_t_r_cons_sec_1half<-subset(xdata_t_r_cons_sec_1half, type_trial=="cons_right")
+
+xdata_t_r_cons_sec_1half$offer_left<-as.numeric(as.character(xdata_t_r_cons_sec_1half$offer_left))
+data_t_r_cons_sec_1half<-xdata_t_r_cons_sec_1half%>%group_by(dyad,proposer_L,type_trial,session)%>% 
+  summarise(offer_left = ((sum(offer_left)/16)))
 
 
 
@@ -247,4 +258,19 @@ write.csv(data_t_l_cons_sec,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ult
 write.csv(data_t_r_cons_first,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_r_cons_first.csv", row.names = FALSE)
 
 write.csv(data_t_r_cons_sec,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_r_cons_sec.csv", row.names = FALSE)
+
+
+#transform to csv for triadic sim/cons 1st half of data
+
+write.csv(triadic_first_half_left_sim,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_l_sim_half.csv", row.names = FALSE)
+
+write.csv(triadic_first_half_right_sim,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_r_sim_half.csv", row.names = FALSE)
+
+write.csv(data_t_l_cons_first_1half,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_l_cons_first_half.csv", row.names = FALSE)
+
+write.csv(data_t_l_cons_sec_1half,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_l_cons_sec_half.csv", row.names = FALSE)
+
+write.csv(data_t_r_cons_first_1half,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_r_cons_first_half.csv", row.names = FALSE)
+
+write.csv(data_t_r_cons_sec_1half,"C:/Users/alex_sanchez/Nextcloud/Postdoc MPI EVA/Ultimatum altruistic comp/Stats/data_t_r_cons_sec_half.csv", row.names = FALSE)
 
