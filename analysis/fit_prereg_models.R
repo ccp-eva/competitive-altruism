@@ -1,7 +1,7 @@
 library(tidyverse)
 library(brms)
 
-d <- read_csv("../data/reformatted_dataset.csv")
+d <- read_csv("../data/session_level_data.csv")
 
 m1 <- brm(bf(total_offer_prop ~ 0 + game_type*session + (0 + game_type|triad_id),
 	    phi ~ 0 + game_type + (0 + game_type|triad_id)),

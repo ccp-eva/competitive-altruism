@@ -1,9 +1,17 @@
 library(tidyverse)
 
-get_session_proportions <- function(d) {
+# Reformat raw data to facilitate the two pre-registered analyses of
+# session-total offers
+
+get_session_measures <- function(d) {
 	d <- d %>%
+		arrange(trial) %>%
 		group_by(triad_id, proposer_id, responder_id, session, game_type) %>%
-		summarise(total_offer=sum(offer), N=length(offer),
+		summarise(total_offer=sum(offer),
+		          first_offer=first(offer),
+			  fourth_offer=offer[4],
+		          final_offer=last(offer),
+			  N=length(offer),
 			  type_trial=first(type_trial)) %>%
 		ungroup() %>%
 		mutate(total_offer_prop=case_when(
@@ -13,7 +21,9 @@ get_session_proportions <- function(d) {
 	return(d)
 }
 
-raw_data <- read_csv("../data/competitive_altruism_dataset.csv") %>%
+raw_data <- read_csv("../data/competitive_altruism_dataset.csv")
+
+clean_trial_data <- raw_data %>%
 	select(dyad, proposer_L, proposer_right, responder,
 	       session, trial, condition_tri_di, type_trial,
 	       offer_left, offer_right)  %>%
@@ -31,12 +41,14 @@ raw_data <- read_csv("../data/competitive_altruism_dataset.csv") %>%
 	       triad_id = dyad,
 	       game_type = condition_tri_di)
 
-full_sessions <- raw_data %>%
-	get_session_proportions()
+write_csv(clean_trial_data, "../data/trial_level_data.csv")
 
-first_halves <- raw_data %>%
+full_sessions <- clean_trial_data %>%
+	get_session_measures()
+
+first_halves <- clean_trial_data %>%
 	filter(game_type == "dyadic" | trial <= 4) %>%
-	get_session_proportions() %>%
+	get_session_measures() %>%
 	rename(first_half_offer=total_offer,
 	       first_half_offer_prop = total_offer_prop)
 
@@ -48,4 +60,29 @@ combined <- right_join(full_sessions, first_halves,
 			  type_trial == "simultaneous" ~ -0.5,
 			  TRUE ~ 0))
 
-write_csv(combined, "../data/reformatted_dataset.csv")
+write_csv(combined, "../data/session_level_data.csv")
+
+# Reformat raw data to facilitate exploratory modelling of
+# trial-by-trial behaviour in triadic trials
+
+raw_data <- read_csv("../data/competitive_altruism_dataset.csv") %>%
+	select(dyad, proposer_L, proposer_right, responder,
+	       session, trial, condition_tri_di, type_trial,
+	       offer_left, offer_right, responder_choice_side) %>%
+	filter(condition_tri_di == "triadic") %>%
+	mutate(offer_left=as.integer(offer_left),
+	       offer_right=as.integer(offer_right))
+
+simultaneous_data <- filter(raw_data, type_trial == "simultaneous")
+
+consecutive_data <- raw_data %>%
+	filter(type_trial != "simultaneous") %>%
+	mutate(first_offer=if_else(type_trial == "cons_left", offer_left, offer_right),
+	       second_offer=if_else(type_trial == "cons_right", offer_left, offer_right),
+	       chose_first=(type_trial == "cons_left" & responder_choice_side == "L") | (type_trial == "cons_right" & responder_choice_side == "R")
+	       )
+
+stopifnot(nrow(simultaneous_data) + nrow(consecutive_data) == nrow(raw_data))
+
+write_csv(simultaneous_data, "../data/simultaneous_data.csv")
+write_csv(consecutive_data, "../data/consecutive_data.csv")
