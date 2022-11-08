@@ -26,7 +26,7 @@ raw_data <- read_csv("../data/competitive_altruism_dataset.csv")
 clean_trial_data <- raw_data %>%
 	select(dyad, proposer_L, proposer_right, responder,
 	       session, trial, condition_tri_di, type_trial,
-	       offer_left, offer_right)  %>%
+	       offer_left, offer_right, responder_choice_side)  %>%
 	pivot_longer(cols=c("offer_left", "offer_right"),
 		     values_to="offer",
 		     names_to="proposer_side") %>%
@@ -34,6 +34,9 @@ clean_trial_data <- raw_data %>%
 	filter(!(type_trial == "right" & proposer_side =="offer_left")) %>%
 	mutate(proposer = if_else(proposer_side == "offer_left",
 				 proposer_L, proposer_right),
+	       accepted = if_else(proposer_side == "offer_left",
+				  responder_choice_side == "L",
+				  responder_choice_side == "R"),
 	       offer = as.integer(offer)) %>%
 	select(-proposer_side, -proposer_L, -proposer_right) %>%
 	rename(responder_id = responder,
@@ -61,6 +64,60 @@ combined <- right_join(full_sessions, first_halves,
 			  TRUE ~ 0))
 
 write_csv(combined, "../data/session_level_data.csv")
+
+# Reformat raw data to facilitate exploratory modelling of
+# increasing behaviour
+increase_data <- tibble(triad_id=character(),
+			proposer_id=character(),
+			session=integer(),
+			trial=integer(),
+			previous_accepted=logical(),
+			consecutive_rejections=integer(),
+			increased=logical()
+			)
+
+all_triads <- unique(clean_trial_data$triad_id)
+for(triad in all_triads) {
+	triad_d <- filter(clean_trial_data, triad_id == triad)
+	proposers <- unique(triad_d$proposer_id)
+	for(proposer in proposers) {
+		for(s in 1:16) {
+			offers <- triad_d %>%
+				filter(proposer_id==proposer, session==s) %>%
+				arrange(trial) %>%
+				pull(offer)
+			accepted <- triad_d %>%
+				filter(proposer_id==proposer, session==s) %>%
+				arrange(trial) %>%
+				pull(accepted)
+			if(length(offers) == 0) { next }
+			increases <- offers[2:length(offers)] > offers[1:(length(offers)-1)]
+			previous_accepted <- accepted[1:length(offers)-1]
+			consec_rejections <- integer(length(previous_accepted))
+			for(i in 1:length(previous_accepted)) {
+				rej <- 0
+				for(j in seq(i,1)) {
+					if(previous_accepted[j]) {
+						break
+					}
+					rej <- rej + 1
+				}
+				consec_rejections[i] <- rej
+			}
+			increase_data <- add_row(increase_data,
+						 triad_id=triad, proposer_id=proposer,
+						 session=s,
+						 trial=2:length(offers),
+						 previous_accepted=accepted[1:length(offers)-1],
+						 consecutive_rejections = consec_rejections,
+						 increased=increases)
+		}
+	}
+}
+
+increase_data <- left_join(increase_data,
+			   unique(select(clean_trial_data, triad_id, session, game_type)))
+write_csv(increase_data, "../data/increase_data.csv")
 
 # Reformat raw data to facilitate exploratory modelling of
 # trial-by-trial behaviour in triadic trials
