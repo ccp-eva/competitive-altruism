@@ -52,6 +52,7 @@ full_sessions <- clean_trial_data %>%
 first_halves <- clean_trial_data %>%
 	filter(game_type == "dyadic" | trial <= 4) %>%
 	get_session_measures() %>%
+	select(-first_offer, -fourth_offer, -final_offer) %>%
 	rename(first_half_offer=total_offer,
 	       first_half_offer_prop = total_offer_prop)
 
