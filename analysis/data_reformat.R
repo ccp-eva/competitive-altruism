@@ -77,14 +77,16 @@ combined <- right_join(full_sessions, first_halves,
 write_csv(combined, "../data/session_level_data.csv")
 
 # Reformat raw data to facilitate exploratory modelling of
-# increasing behaviour
+# offer increasing behaviour
 increase_data <- tibble(triad_id=character(),
 			proposer_id=character(),
 			session=integer(),
 			trial=integer(),
 			previous_accepted=logical(),
+			previous_null=logical(),
 			consecutive_rejections=integer(),
-			increased=logical()
+			increased_self=logical(),
+			increased_winner=logical(),
 			)
 
 all_triads <- unique(clean_trial_data$triad_id)
@@ -93,17 +95,27 @@ for(triad in all_triads) {
 	proposers <- unique(triad_d$proposer_id)
 	for(proposer in proposers) {
 		for(s in 1:16) {
-			offers <- triad_d %>%
+			own_offers <- triad_d %>%
 				filter(proposer_id==proposer, session==s) %>%
 				arrange(trial) %>%
 				pull(offer)
+			winning_offers <- triad_d %>%
+				filter(proposer_id==proposer, session==s) %>%
+				arrange(trial) %>%
+				pull(winning_offer)
+			stopifnot(length(own_offers) == length(winning_offers))
 			accepted <- triad_d %>%
 				filter(proposer_id==proposer, session==s) %>%
 				arrange(trial) %>%
 				pull(accepted)
-			if(length(offers) == 0) { next }
-			increases <- offers[2:length(offers)] > offers[1:(length(offers)-1)]
-			previous_accepted <- accepted[1:length(offers)-1]
+			if(length(own_offers) == 0) { next }
+
+			increases_self <- own_offers[2:length(own_offers)] > own_offers[1:(length(own_offers)-1)]
+			increases_winner <- winning_offers[2:length(winning_offers)] > winning_offers[1:(length(winning_offers)-1)]
+			previous_accepted <- accepted[1:length(own_offers)-1]
+			previous_null <- is.na(winning_offers[1:length(winning_offers)-1])
+			print(winning_offers)
+			print(previous_null)
 			consec_rejections <- integer(length(previous_accepted))
 			for(i in 1:length(previous_accepted)) {
 				rej <- 0
@@ -118,10 +130,13 @@ for(triad in all_triads) {
 			increase_data <- add_row(increase_data,
 						 triad_id=triad, proposer_id=proposer,
 						 session=s,
-						 trial=2:length(offers),
-						 previous_accepted=accepted[1:length(offers)-1],
+						 trial=2:length(own_offers),
+						 previous_accepted=accepted[1:length(own_offers)-1],
+						 previous_null=previous_null,
 						 consecutive_rejections = consec_rejections,
-						 increased=increases)
+						 increased_self=increases_self,
+						 increased_winner=increases_winner,
+			)
 		}
 	}
 }
