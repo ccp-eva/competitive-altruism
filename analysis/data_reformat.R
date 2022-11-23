@@ -160,7 +160,8 @@ simultaneous_data <- filter(raw_data, type_trial == "simultaneous")
 
 consecutive_data <- raw_data %>%
 	filter(type_trial != "simultaneous") %>%
-	rename(proposer_left = proposer_L) %>%
+	rename(proposer_left = proposer_L,
+	       triad_id = dyad) %>%
 	mutate(first_offer=if_else(type_trial == "cons_left", offer_left, offer_right),
 	       second_offer=if_else(type_trial == "cons_right", offer_left, offer_right),
 	       first_proposer=if_else(type_trial == "cons_left", proposer_left, proposer_right),
