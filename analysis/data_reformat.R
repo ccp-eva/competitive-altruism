@@ -23,10 +23,19 @@ get_session_measures <- function(d) {
 
 raw_data <- read_csv("../data/competitive_altruism_dataset.csv")
 
+# Turn stringy NAs into the real deal
+raw_data <- raw_data %>%
+	mutate(offer_left = as.integer(ifelse(offer_left == "na", NA, offer_left)),
+	       offer_right = as.integer(ifelse(offer_right == "na", NA, offer_right)),
+	       responder_choice_side = ifelse(responder_choice_side == "na", NA, responder_choice_side),
+	       )
+
 clean_trial_data <- raw_data %>%
 	select(dyad, proposer_L, proposer_right, responder,
 	       session, trial, condition_tri_di, type_trial,
 	       offer_left, offer_right, responder_choice_side)  %>%
+	mutate(winning_offer = case_when(responder_choice_side == "L" ~ offer_left,
+                                         responder_choice_side == "R" ~ offer_right)) %>%
 	pivot_longer(cols=c("offer_left", "offer_right"),
 		     values_to="offer",
 		     names_to="proposer_side") %>%
@@ -37,6 +46,7 @@ clean_trial_data <- raw_data %>%
 	       accepted = if_else(proposer_side == "offer_left",
 				  responder_choice_side == "L",
 				  responder_choice_side == "R"),
+	       accepted = replace_na(accepted, FALSE),
 	       offer = as.integer(offer)) %>%
 	select(-proposer_side, -proposer_L, -proposer_right) %>%
 	rename(responder_id = responder,
