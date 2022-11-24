@@ -8,4 +8,4 @@ m <- brm(increased ~ 0 + game_type*session + (0 + game_type|triad_id),
 	 prior=prior(normal(-1, 1.5), class="b"),
 	 cores=4, control=list(adapt_delta=0.95))
 
-write_rds(m, "increase_prob.rds")
+write_rds(m, "first_last.rds")
