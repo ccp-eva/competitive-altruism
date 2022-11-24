@@ -8,7 +8,7 @@ p95 <- c(0.025, 0.975)
 
 print("")
 print("PRE-REGISTERED MODELS")
-print("##################")
+print("#####################")
 print("")
 
 # m1
@@ -84,3 +84,28 @@ colnames(indiv_values)[1] <- "mean"
 rownames(indiv_values) <- proposers
 print("Individual proposer probabilities:")
 print(indiv_values)
+
+print("")
+print("FIRST VS LAST MODELS")
+print("###################")
+print("")
+
+m_first_last <- read_rds("first_last.rds")
+preds <- plogis(posterior_linpred(m_first_last, re_formula=NA,
+				  newdata=expand_grid(game_type=c("dyadic", "triadic"), session=1:16)))
+per_session_probs <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(per_session_probs)[1] <- "mean"
+
+print("Probability that final offer of session is higher than first:")
+print("")
+print("Dyadic:")
+print("")
+print(per_session_probs[1:16,])
+print("")
+print("Triadic")
+print("")
+print(per_session_probs[17:32,])
+print("")
+print("Per-session contrast (triadic - dyadic) in probabilites:")
+contrast <- preds[,17:32] - preds[,1:16]
+print(cbind(colMeans(contrast), colQuantiles(contrast, probs=p95)))
