@@ -124,5 +124,52 @@ nl()
 contrast <- preds[,17:32] - preds[,1:16]
 print(cbind(colMeans(contrast), colQuantiles(contrast, probs=p95)))
 
+nl()
+pretty_header("CONDITIONAL INCREASING MODELS")
+
+# Relative to self
+
+m_self <- read_rds("increase_over_self.rds")
+preds <- plogis(posterior_linpred(m_self, re_formula=NA,
+			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(TRUE, FALSE),
+					       session=8)))
+pretty_str("Probability of increasing over own previous offer in 8th triadic trial:")
+nl()
+cond_probs <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(cond_probs)[1] <- "mean"
+rownames(cond_probs) <- c("Previous offer accepted", "Previous offer rejected")
+print(cond_probs)
+
+nl()
+pretty_str("Accepted vs rejected contrast:")
+nl()
+contrast <- preds[,2] - preds[,1]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast)[1] <- "mean"
+print(contrast)
+
+nl()
+
+# Relative to winner
+
+m_winner <- read_rds("increase_over_winner.rds")
+preds <- plogis(posterior_linpred(m_winner, re_formula=NA,
+			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(TRUE, FALSE),
+					       session=8)))
+pretty_str("Probability of increasing over previous winning offer in 8th triadic trial:")
+nl()
+cond_probs <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(cond_probs)[1] <- "mean"
+rownames(cond_probs) <- c("Previous offer accepted", "Previous offer rejected")
+print(cond_probs)
+
+nl()
+pretty_str("Accepted vs rejected contrast:")
+nl()
+contrast <- preds[,2] - preds[,1]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast)[1] <- "mean"
+print(contrast)
+
 sink()
 close(fp)
