@@ -111,7 +111,7 @@ for(triad in all_triads) {
 			if(length(own_offers) == 0) { next }
 
 			increases_self <- own_offers[2:length(own_offers)] > own_offers[1:(length(own_offers)-1)]
-			increases_winner <- winning_offers[2:length(winning_offers)] > winning_offers[1:(length(winning_offers)-1)]
+			increases_winner <- own_offers[2:length(own_offers)] > winning_offers[1:(length(winning_offers)-1)]
 			previous_accepted <- accepted[1:length(own_offers)-1]
 			previous_null <- is.na(winning_offers[1:length(winning_offers)-1])
 			print(winning_offers)
