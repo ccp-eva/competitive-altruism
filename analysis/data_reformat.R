@@ -95,6 +95,7 @@ for(triad in all_triads) {
 	proposers <- unique(triad_d$proposer_id)
 	for(proposer in proposers) {
 		for(s in 1:16) {
+			# Extract offer data for this proposer in this session
 			own_offers <- triad_d %>%
 				filter(proposer_id==proposer, session==s) %>%
 				arrange(trial) %>%
@@ -108,14 +109,16 @@ for(triad in all_triads) {
 				filter(proposer_id==proposer, session==s) %>%
 				arrange(trial) %>%
 				pull(accepted)
+
+			# Skip cases where no offers were made
 			if(length(own_offers) == 0) { next }
 
 			increases_self <- own_offers[2:length(own_offers)] > own_offers[1:(length(own_offers)-1)]
 			increases_winner <- own_offers[2:length(own_offers)] > winning_offers[1:(length(winning_offers)-1)]
 			previous_accepted <- accepted[1:length(own_offers)-1]
 			previous_null <- is.na(winning_offers[1:length(winning_offers)-1])
-			print(winning_offers)
-			print(previous_null)
+
+			# Count how many offers it's been since we were accepted
 			consec_rejections <- integer(length(previous_accepted))
 			for(i in 1:length(previous_accepted)) {
 				rej <- 0
@@ -127,6 +130,8 @@ for(triad in all_triads) {
 				}
 				consec_rejections[i] <- rej
 			}
+
+			# Add row to main table
 			increase_data <- add_row(increase_data,
 						 triad_id=triad, proposer_id=proposer,
 						 session=s,
