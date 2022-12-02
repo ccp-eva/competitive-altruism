@@ -86,7 +86,9 @@ increase_data <- tibble(triad_id=character(),
 			previous_null=logical(),
 			consecutive_rejections=integer(),
 			increased_self=logical(),
+			matched_self=logical(),
 			increased_winner=logical(),
+			matched_winner=logical(),
 			)
 
 all_triads <- unique(clean_trial_data$triad_id)
@@ -114,7 +116,9 @@ for(triad in all_triads) {
 			if(length(own_offers) == 0) { next }
 
 			increases_self <- own_offers[2:length(own_offers)] > own_offers[1:(length(own_offers)-1)]
+			matches_self <- own_offers[2:length(own_offers)] >= own_offers[1:(length(own_offers)-1)]
 			increases_winner <- own_offers[2:length(own_offers)] > winning_offers[1:(length(winning_offers)-1)]
+			matches_winner <- own_offers[2:length(own_offers)] >= winning_offers[1:(length(winning_offers)-1)]
 			previous_accepted <- accepted[1:length(own_offers)-1]
 			previous_null <- is.na(winning_offers[1:length(winning_offers)-1])
 
@@ -140,7 +144,9 @@ for(triad in all_triads) {
 						 previous_null=previous_null,
 						 consecutive_rejections = consec_rejections,
 						 increased_self=increases_self,
+						 matched_self=matches_self,
 						 increased_winner=increases_winner,
+						 matched_winner=matches_winner,
 			)
 		}
 	}
