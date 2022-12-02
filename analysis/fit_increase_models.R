@@ -10,12 +10,14 @@ d <- read_csv("../data/increase_data.csv") %>%
 d <- filter(d, !is.na(increased_winner))
 
 m_self <- brm(increased_self ~ previous_accepted*session + (1|proposer_id),
-	      data=d, family="bernoulli", control=list(adapt_delta=0.95),
-              prior = prior(normal(0, 1.5), class="b"))
+	      data=d, family="bernoulli",
+              prior = prior(normal(0, 1.5), class="b"),
+	      control=list(adapt_delta=0.95), cores=4)
 write_rds(m_self, "increase_over_self.rds")
 
 m_winner <- brm(matched_winner ~ previous_accepted*session + (1|proposer_id),
-	        data=d, family="bernoulli", control=list(adapt_delta=0.95),
-                prior = prior(normal(0, 1.5), class="b"))
+	        data=d, family="bernoulli",
+                prior = prior(normal(0, 1.5), class="b"),
+		control=list(adapt_delta=0.95), cores=4)
 
 write_rds(m_winner, "increase_over_winner.rds")
