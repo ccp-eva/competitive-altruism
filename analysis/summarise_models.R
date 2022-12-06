@@ -47,7 +47,7 @@ print(contrast)
 m2 <- read_rds("model2.rds")
 preds <- posterior_predict(m2,re_formula=NA,
 			   newdata=expand_grid(game_type=c("triadic"), consec=c(-0.5, 0.5),
-					       session=8))
+					       session=1))
 pretty_str("Including effect of consecutive vs simultaneous: (M2)")
 nl()
 consec_values <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
@@ -100,7 +100,17 @@ rownames(indiv_values) <- proposers
 pretty_str("Individual proposer probabilities:")
 print(indiv_values)
 
+# Raising vs initial offer
+m_raises_by_first <- read_rds("second_raises_by_first.rds")
+nd <- read_csv("raising_by_first_offer_preds.csv")
+preds <- plogis(posterior_linpred(m_raises_by_first, newdata=nd, re_formula=NA))
 nl()
+pretty_str("Posterior probability that estimated raising rate exceeds baseline:")
+for(i in 1:9) {
+	p <- mean(preds[,i] > nd$theory[i])
+	pretty_str(paste("First offer", i-1, ":", p))
+}
+
 pretty_header("FIRST VS LAST MODELS")
 
 m_first_last <- read_rds("first_last.rds")
