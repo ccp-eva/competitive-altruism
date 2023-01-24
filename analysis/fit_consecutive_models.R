@@ -3,27 +3,27 @@ library(brms)
 
 d <- read_csv("../data/consecutive_data.csv")
 
-m_responder_chooses_first <- brm(chose_first ~ 1 + (1|responder), data=d,
+m_responder_chooses_first <- brm(chose_first ~ 1 + session + (1|responder), data=d,
 		family="bernoulli",
 		prior = prior(normal(0, 1.5), class="Intercept"),
 		control=list(adapt_delta=0.95), cores=4)
 write_rds(m_responder_chooses_first, "chooses_first.rds")
 
 d$raises <- d$second_offer > d$first_offer
-m_second_proposer_raises <- brm(raises ~ 1 + (1|second_proposer), data=d,
+m_second_proposer_raises <- brm(raises ~ 1 + session + (1|second_proposer), data=d,
 		family="bernoulli",
 		prior = prior(normal(0, 1.5), class="Intercept"),
 		control=list(adapt_delta=0.95), cores=4)
 write_rds(m_second_proposer_raises, "second_raises.rds")
 
 d$fair_raise_possible = d$first_offer < 4
-m_raises_if_fair <- brm(raises ~ 0 + fair_raise_possible + (1|second_proposer), data=d,
+m_raises_if_fair <- brm(raises ~ 0 + fair_raise_possible*session + (1|second_proposer), data=d,
 		family="bernoulli",
 		prior = prior(normal(0, 1.5), class="b"),
 		control=list(adapt_delta=0.95), cores=4)
 write_rds(m_raises_if_fair, "second_raises_if_fair.rds")
 
-m_raises_by_first <- brm(raises ~ mo(first_offer) + (1|second_proposer), data=d,
+m_raises_by_first <- brm(raises ~ mo(first_offer) + session + (1|second_proposer), data=d,
 		family="bernoulli",
 		prior = prior(normal(0, 1.5), class="Intercept") +
 		        prior(normal(0, 1.5), class="b"),
