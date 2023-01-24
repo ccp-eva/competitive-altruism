@@ -1,6 +1,8 @@
 library(tidyverse)
 library(brms)
 
+library(matrixStats)
+
 d <- read_csv("../data/consecutive_data.csv")
 
 m_responder_chooses_first <- brm(chose_first ~ 1 + session + (1|responder), data=d,
@@ -30,14 +32,6 @@ m_raises_by_first <- brm(raises ~ mo(first_offer) + session + (1|second_proposer
 		control=list(adapt_delta=0.95), cores=4)
 write_rds(m_raises_by_first, "second_raises_by_first.rds")
 
-# Extract predictions of raising probability for each possible
-# first offer according to monotonic model
-nd <- tibble(expand_grid(first_offer=0:8))
-preds <- plogis(posterior_linpred(m_raises_by_first, newdata=nd, re_formula=NA))
-nd$mean <- colMeans(preds)
-nd$lower <- colQuantiles(preds, probs=0.025)
-nd$upper <- colQuantiles(preds, probs=0.975)
-
 # Estimate expected raising probability due entirely to tendency
 # not to make high offers, by randomly pairing first offers
 d_r <- tibble(first_offer=integer(), second_higher=logical())
@@ -48,10 +42,23 @@ for(i in 1:8) {
 	d_r <- add_row(d_r, first_offer=first_offers,
 		       second_higher = second_offers > first_offers)
 }
+d_r <- d_r %>%
+	group_by(first_offer) %>%
+	summarise(baseline=mean(second_higher))
+
+# Extract predictions of raising probability for each possible
+# first offer according to monotonic model
+nd <- tibble(expand_grid(first_offer=0:8, session=1:16)) %>%
+	left_join(d_r)
+preds <- plogis(posterior_linpred(m_raises_by_first, newdata=nd, re_formula=NA))
+nd$mean <- colMeans(preds)
+nd$lower <- colQuantiles(preds, probs=0.025)
+nd$upper <- colQuantiles(preds, probs=0.975)
+nd$model_higher <- colMeans(preds > matrix(rep(nd$baseline, 4000), nrow=4000, byrow=TRUE))
 
 # Add baseline estimates to table of predictions
-nd$theory <- d_r %>%
+nd <- d_r %>%
 	group_by(first_offer) %>%
-	summarise(p_raise=mean(second_higher)) %>%
-	pull(p_raise)
+	summarise(theory=mean(second_higher)) %>%
+	left_join(nd)
 write_csv(nd, "raising_by_first_offer_preds.csv")
