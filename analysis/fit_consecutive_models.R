@@ -47,7 +47,8 @@ d_r <- d_r %>%
 	summarise(baseline=mean(second_higher))
 
 # Extract predictions of raising probability for each possible
-# first offer according to monotonic model
+# first offer according to monotonic model and compare against
+# baselines
 nd <- tibble(expand_grid(first_offer=0:8, session=1:16)) %>%
 	left_join(d_r)
 preds <- plogis(posterior_linpred(m_raises_by_first, newdata=nd, re_formula=NA))
@@ -55,10 +56,4 @@ nd$mean <- colMeans(preds)
 nd$lower <- colQuantiles(preds, probs=0.025)
 nd$upper <- colQuantiles(preds, probs=0.975)
 nd$model_higher <- colMeans(preds > matrix(rep(nd$baseline, 4000), nrow=4000, byrow=TRUE))
-
-# Add baseline estimates to table of predictions
-nd <- d_r %>%
-	group_by(first_offer) %>%
-	summarise(theory=mean(second_higher)) %>%
-	left_join(nd)
 write_csv(nd, "raising_by_first_offer_preds.csv")
