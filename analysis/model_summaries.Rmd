@@ -1,0 +1,267 @@
+---
+title: "Competitive altruism model summaries"
+author: "Luke Maurits <<luke_maurits@eva.mpg.de>>"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    number_sections: TRUE
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(matrixStats)
+library(tidyverse)
+library(brms)
+
+p95 <- c(0.025, 0.975)
+
+pretty_col_names <- c("Posterior mean",
+                      "95% HPD lower",
+                      "95% HPD upper")
+
+opts_chunk$set(echo=FALSE)
+```
+
+# Pre-registered models of total proportional offer
+
+## M1: Proportional total offer, dyadic vs triadic
+
+```{r}
+m1 <- read_rds("model1.rds")
+preds <- posterior_predict(m1,re_formula=NA,
+			   newdata=expand_grid(game_type=c("dyadic", "triadic"),
+					       session=8))
+```
+
+### Posterior predictive distribution for total proportional offers in 8th session
+
+```{r}
+condition_values <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(condition_values) <- pretty_col_names
+rownames(condition_values) <- c("Dyadic", "Triadic")
+kable(condition_values, digits=2)
+```
+
+### Posterior predictive distribution for difference in total proportional offers in 8th session
+
+```{r}
+contrast <- preds[,2] - preds[,1]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast) <- pretty_col_names
+contrast <- as_tibble(t(contrast))
+kable(contrast, digits=2)
+```
+
+## M2: Proportional total offer, consecutive vs simultaneous
+
+```{r}
+m2 <- read_rds("model2.rds")
+draws <- as_draws_df(m2)
+preds <- posterior_predict(m2,re_formula=NA,
+			   newdata=expand_grid(game_type=c("triadic"), consec=c(-0.5, 0.5),
+					       session=8))
+```
+### Including effect of consecutive vs simultaneous: (M2)
+
+```{r}
+consec_values <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(consec_values) <- pretty_col_names
+rownames(consec_values) <- c("Simultaneous", "Consecutive")
+kable(consec_values, digits=2)
+```
+
+Posterior probability that mean consecutive offer is higher than mean simulteanous offer:
+
+```{r}
+print(mean(draws$b_consec > 0))
+```
+
+Posterior predictive distribution for difference in offer between conditions:
+```{r}
+contrast <- preds[,2] - preds[,1]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast) <- pretty_col_names
+contrast <- as_tibble(t(contrast))
+kable(t(contrast), digits=2)
+```
+
+
+# Models of tendency for final offfers to exceed initial offers within sessions
+
+```{r}
+m_first_last <- read_rds("first_last.rds")
+preds <- plogis(posterior_linpred(m_first_last, re_formula=NA,
+				  newdata=expand_grid(game_type=c("dyadic", "triadic"), session=1:16)))
+
+marginal_dyadic_probs <- as.vector(preds)[1:64000]
+marginal_triadic_probs <- as.vector(preds)[64001:128000]
+```
+
+### Marginalised over session probabilities of increasing within a session
+
+```{r}
+dyadic_sum <- c(mean(marginal_dyadic_probs), quantile(marginal_dyadic_probs, probs=p95))
+triadic_sum <- c(mean(marginal_triadic_probs), quantile(marginal_triadic_probs, probs=p95))
+x <- rbind(dyadic_sum, triadic_sum)
+colnames(x) <- pretty_col_names
+rownames(x) <- c("Dyadic", "Triadic")
+kable(x, digits=2)
+```
+
+### Per-session probabilities
+
+#### Dyadic
+
+```{r}
+per_session_probs <- cbind(rep(1:16,2), colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(per_session_probs) <- c("Session", pretty_col_names)
+kable(per_session_probs[1:16,], digits=2)
+```
+#### Triadic
+```{r}
+kable(per_session_probs[17:32,], digits=2)
+```
+
+#### Per session contrast in probabilities (triadic - dyadic)
+
+```{r}
+contrast <- preds[,17:32] - preds[,1:16]
+x <- cbind(1:16, colMeans(contrast), colQuantiles(contrast, probs=p95))
+colnames(x) <-  c("Session", pretty_col_names)
+kable(x, digits=2)
+```
+
+# Models of tendency to increase offers from trial to trial
+
+## Relative to self
+
+```{r}
+m_self <- read_rds("increase_over_self.rds")
+preds <- plogis(posterior_linpred(m_self, re_formula=NA,
+			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(TRUE, FALSE),
+					       session=1:16)))
+```
+
+#### Marginalised over sessions
+
+```{r}
+marginal_accepted_probs <- as.vector(preds)[1:64000]
+marginal_rejected_probs <- as.vector(preds)[64001:128000]
+
+accepted_sum <- c(mean(marginal_accepted_probs), quantile(marginal_accepted_probs, probs=p95))
+rejected_sum <- c(mean(marginal_rejected_probs), quantile(marginal_rejected_probs, probs=p95))
+x <- rbind(accepted_sum, rejected_sum)
+colnames(x) <- pretty_col_names
+rownames(x) <- c("Previous offer accepted", "Previous offer rejected")
+kable(x, digits=2)
+```
+
+### Accepted vs rejected contrast
+
+```{r}
+contrast <- preds[,17:32] - preds[,1:16]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast) <- pretty_col_names
+kable(as_tibble(t(contrast)), digits=2)
+```
+
+## Relative to previous trial winner
+
+```{r}
+m_winner <- read_rds("increase_over_winner.rds")
+preds <- plogis(posterior_linpred(m_winner, re_formula=NA,
+			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(TRUE, FALSE),
+					       session=1:16)))
+```
+
+```{r}
+marginal_accepted_probs <- as.vector(preds)[1:64000]
+marginal_rejected_probs <- as.vector(preds)[64001:128000]
+
+accepted_sum <- c(mean(marginal_accepted_probs), quantile(marginal_accepted_probs, probs=p95))
+rejected_sum <- c(mean(marginal_rejected_probs), quantile(marginal_rejected_probs, probs=p95))
+x <- rbind(accepted_sum, rejected_sum)
+colnames(x) <- pretty_col_names
+rownames(x) <- c("Previous offer accepted", "Previous offer rejected")
+kable(x, digits=2)
+```
+
+### Accepted vs rejected contrast
+
+```{r}
+contrast <- preds[,17:32] - preds[,1:16]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast) <- pretty_col_names
+kable(as_tibble(t(contrast)), digits=2)
+```
+
+# Models of tendency of second proposers to outbid first proposers
+
+## Without accounting for value of first offer
+
+```{r}
+m_raises <- read_rds("second_raises.rds")
+draws <- as_draws_df(m_raises)
+preds <- plogis(posterior_linpred(m_raises, newdata=tibble(session=1:16), re_formula=NA))
+```
+
+### Posterior probability that second proposer become more likely to outbid first proposer as sessions increase
+
+```{r}
+print(mean(draws$b_session >0))
+```
+
+### Probability that second proposer offers more than first proposer in consecutive trials, marginalising over sessions
+
+```{r}
+marginalised_probs <- c(mean(preds), quantile(preds, probs=p95))
+names(marginalised_probs) <- pretty_col_names
+kable(as_tibble(t(marginalised_probs)), digits=2)
+```
+
+### Per session probabilities that second proposer offers more than first proposer in consecutive trials
+
+```{r}
+per_session_probs <- cbind(1:16, colMeans(preds), colQuantiles(preds, probs=p95))
+colnames(per_session_probs) <- c("Session", pretty_col_names)
+kable(per_session_probs, digits=2)
+```
+
+## Stratifying by first offer
+
+```{r, include=FALSE}
+m_raises_by_first <- read_rds("second_raises_by_first.rds")
+nd <- read_csv("raising_by_first_offer_preds.csv")
+```
+
+### Outbidding probabilities in first session, stratified by first offer
+```{r}
+nd %>%
+  filter(session==1) %>%
+  select(-session) %>%
+  rename(`First Offer`=first_offer,
+         `Posterior mean`=mean,
+         `95% HPD lower`=lower,
+         `95% HPD upper`=upper,
+         `Baseline outbidding rate`=baseline,
+         `PP rate above basline`=model_higher,
+         `PP rate above chance`=above_chance) %>%
+  kable(digits=2)
+```
+
+### Outbidding probabilities in final session, stratified by first offer
+
+```{r}
+nd %>%
+  filter(session==16) %>%
+  select(-session) %>%
+  rename(`First Offer`=first_offer,
+         `Posterior mean`=mean,
+         `95% HPD lower`=lower,
+         `95% HPD upper`=upper,
+         `Baseline outbidding rate`=baseline,
+         `PP rate above basline`=model_higher,
+         `PP rate above chance`=above_chance) %>%
+  kable(digits=2)
+```
