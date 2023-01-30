@@ -62,7 +62,7 @@ preds <- posterior_predict(m2,re_formula=NA,
 			   newdata=expand_grid(game_type=c("triadic"), consec=c(-0.5, 0.5),
 					       session=8))
 ```
-### Including effect of consecutive vs simultaneous: (M2)
+### Posterior predictive distribution for total proportional offers in 8th triadic session
 
 ```{r}
 consec_values <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
@@ -83,9 +83,9 @@ contrast <- preds[,2] - preds[,1]
 contrast <- c(mean(contrast), quantile(contrast, probs=p95))
 names(contrast) <- pretty_col_names
 contrast <- as_tibble(t(contrast))
-kable(t(contrast), digits=2)
+kable(contrast, digits=2)
 ```
-
+\newpage
 
 # Models of tendency for final offfers to exceed initial offers within sessions
 
@@ -143,7 +143,7 @@ preds <- plogis(posterior_linpred(m_self, re_formula=NA,
 					       session=1:16)))
 ```
 
-#### Marginalised over sessions
+### Marginalised over sessions
 
 ```{r}
 marginal_accepted_probs <- as.vector(preds)[1:64000]
@@ -175,6 +175,8 @@ preds <- plogis(posterior_linpred(m_winner, re_formula=NA,
 					       session=1:16)))
 ```
 
+### Marginalised over sessions
+
 ```{r}
 marginal_accepted_probs <- as.vector(preds)[1:64000]
 marginal_rejected_probs <- as.vector(preds)[64001:128000]
@@ -186,6 +188,8 @@ colnames(x) <- pretty_col_names
 rownames(x) <- c("Previous offer accepted", "Previous offer rejected")
 kable(x, digits=2)
 ```
+
+\newpage
 
 ### Accepted vs rejected contrast
 
@@ -206,7 +210,7 @@ draws <- as_draws_df(m_raises)
 preds <- plogis(posterior_linpred(m_raises, newdata=tibble(session=1:16), re_formula=NA))
 ```
 
-### Posterior probability that second proposer become more likely to outbid first proposer as sessions increase
+### Posterior probability that second proposer becomes more likely to outbid first proposer as sessions increase
 
 ```{r}
 print(mean(draws$b_session >0))
@@ -228,6 +232,8 @@ colnames(per_session_probs) <- c("Session", pretty_col_names)
 kable(per_session_probs, digits=2)
 ```
 
+\newpage
+
 ## Stratifying by first offer
 
 ```{r, include=FALSE}
@@ -237,8 +243,9 @@ nd <- read_csv("raising_by_first_offer_preds.csv")
 
 ### Outbidding probabilities in first session, stratified by first offer
 ```{r}
-nd %>%
-  filter(session==1) %>%
+pretty_session_predictions <- function(nd, s) {
+  nd %>%
+  filter(session==s) %>%
   select(-session) %>%
   rename(`First Offer`=first_offer,
          `Posterior mean`=mean,
@@ -247,21 +254,14 @@ nd %>%
          `Baseline outbidding rate`=baseline,
          `PP rate above basline`=model_higher,
          `PP rate above chance`=above_chance) %>%
-  kable(digits=2)
+  return
+}
+
+kable(pretty_session_predictions(nd, 1), digits=2)
 ```
 
 ### Outbidding probabilities in final session, stratified by first offer
 
 ```{r}
-nd %>%
-  filter(session==16) %>%
-  select(-session) %>%
-  rename(`First Offer`=first_offer,
-         `Posterior mean`=mean,
-         `95% HPD lower`=lower,
-         `95% HPD upper`=upper,
-         `Baseline outbidding rate`=baseline,
-         `PP rate above basline`=model_higher,
-         `PP rate above chance`=above_chance) %>%
-  kable(digits=2)
+kable(pretty_session_predictions(nd, 16), digits=2)
 ```
