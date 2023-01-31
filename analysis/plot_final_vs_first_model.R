@@ -1,6 +1,8 @@
 library(matrixStats)
 library(tidyverse)
 
+dir.create("../plots/", showWarnings = FALSE)
+
 m <- read_rds( "first_last.rds")
 
 nd <- expand_grid(game_type=c("dyadic", "triadic"), session=1:16)
