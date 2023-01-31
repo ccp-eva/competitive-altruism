@@ -6,6 +6,10 @@ competitive altruism in a triadic Ultimatum Game" by Sánchez-Amaro et al.  By
 cloning the repository you can reproduce all the figures and essential
 statistical numbers found in the paper.
 
+The data and code are both licensed under the Creative Commons Attribution
+copyright license, like the paper itself.  See the `LICENSE.md` file for
+details.
+
 ## Replication quickstart guide:
 
 After cloning the repository, the various `.R` scripts in the `analysis/` folder
