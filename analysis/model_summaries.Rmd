@@ -1,5 +1,6 @@
 ---
-title: "Competitive altruism model summaries"
+title: "Chimpanzees engage in competitive altruism in a triadic Ultimatum Game"
+subtitle: "Model summaries"
 author: "Luke Maurits <<luke_maurits@eva.mpg.de>>"
 date: "`r Sys.Date()`"
 output:
