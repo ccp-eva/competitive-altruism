@@ -253,3 +253,10 @@ Posterior predictive distribution for difference in offer between conditions:
 |           6|                     0.08|           0.08|          0.01|          0.24|                 0.00|                  0.43|
 |           7|                     0.02|           0.05|          0.00|          0.18|                 0.00|                  0.76|
 |           8|                     0.00|           0.03|          0.00|          0.12|                 0.00|                  1.00|
+
+### Difference in outbidding probability between initial offers of 4 and 5
+
+
+| Posterior mean| 95% HPD lower| 95% HPD upper|
+|--------------:|-------------:|-------------:|
+|           0.32|          0.09|          0.53|
