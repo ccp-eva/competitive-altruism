@@ -41,7 +41,10 @@ ggsave("../plots/increase_over_self.png")
 
 m_winner <- read_rds("increase_over_winner.rds")
 
+nd <- expand_grid(previous_accepted=c(T,F), session=1:16)
 preds <- plogis(posterior_linpred(m_winner, newdata=nd, re_formula=NA))
+nd = mutate(nd, previous_accepted=replace(previous_accepted, previous_accepted==FALSE, "rejected")) %>%
+  mutate(previous_accepted=replace(previous_accepted, previous_accepted==TRUE, "accepted"))
 nd$mean_p <- colMeans(preds)
 nd$lower_p <- colQuantiles(preds, p=0.025)
 nd$upper_p <- colQuantiles(preds, p=0.975)
