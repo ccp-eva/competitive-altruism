@@ -17,8 +17,14 @@ ggplot() +
 	geom_line(aes(x=first_offer, y=p, colour=type), data=filter(nd_long, type=="baseline")) +
 	geom_hline(yintercept=0.5, linetype="dotted") +
 	facet_wrap(~session, ncol=4, nrow=4) +
-	scale_color_manual(name = "foo", values = c("baseline" = .blue, "mean" = .red)) +
-	ylim(c(0, 1))
+	scale_color_manual(name = "type", values = c("baseline" = .blue, "mean" = .red)) +
+	ylim(c(0, 1)) +
+  theme(axis.title.y = element_text(size = rel(1.3), angle = 90)) +
+  theme(axis.title.x = element_text(size = rel(1.3), angle = 00)) +
+  theme(axis.text=element_text(size=12)) +
+  ylab("probability to outcompete 1st offers") +
+  xlab("first offer value") +
+  theme_bw()
 ggsave("../plots/raising_by_first_offer_by_session.png")
 
 # Next plot raw data vs model, collapsing sessions

@@ -34,8 +34,17 @@ dd <- tibble(session=1:16,
 	     lower_diff=colQuantiles(diff_pred, probs=0.025),
 	     upper_diff=colQuantiles(diff_pred, probs=0.975)
 	     )
-ggplot(dd, aes(x=session)) +
-	geom_line(aes(y=mean_diff)) +
-	geom_ribbon(aes(ymin=lower_diff, ymax=upper_diff), alpha=0.25) +
-	geom_hline(yintercept=0.0, linetype="dotted")
+ggplot(dd, aes(x=session) ) +
+  ylab("difference between conditions") +
+	geom_line(aes(y=mean_diff), col="#8a49a1") +
+	geom_ribbon(aes(ymin=lower_diff, ymax=upper_diff), fill="#e56969", alpha=0.35) +
+	geom_hline(yintercept=0.0, linetype="dotted", col="#8a49a1") +
+  theme_bw() +
+  theme(panel.border = element_blank()) +
+  theme(axis.line = element_line(colour = "black"))+
+  theme(axis.title.y = element_text(size = rel(1.3), angle = 90)) +
+  theme(axis.title.x = element_text(size = rel(1.3), angle = 00)) +
+  theme(axis.text=element_text(size=12))
+
+grid.text("1a",0.975, 0.965)
 ggsave("../plots/increase_probabilities_diff.png")
