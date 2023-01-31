@@ -266,3 +266,15 @@ kable(pretty_session_predictions(nd, 1), digits=2)
 ```{r}
 kable(pretty_session_predictions(nd, 16), digits=2)
 ```
+
+### Difference in outbidding probability between initial offers of 4 and 5
+
+```{r}
+nd <- expand_grid(session=16, first_offer=c(4, 5))
+preds <- plogis(posterior_linpred(m_raises_by_first, newdata=nd, re_formula=NA))
+contrast <- preds[,1] - preds[,2]
+contrast <- c(mean(contrast), quantile(contrast, probs=p95))
+names(contrast) <- pretty_col_names
+contrast <- as_tibble(t(contrast))
+kable(contrast, digits=2)
+```
