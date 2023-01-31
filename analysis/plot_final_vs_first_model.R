@@ -1,7 +1,7 @@
 library(matrixStats)
 library(tidyverse)
 
-m <- read_rds( "increase_prob.rds")
+m <- read_rds( "first_last.rds")
 
 nd <- expand_grid(game_type=c("dyadic", "triadic"), session=1:16)
 preds <- posterior_linpred(m, newdata=nd, re_formula=NA) 
