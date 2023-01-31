@@ -2,6 +2,8 @@ library(tidyverse)
 library(scales)
 library(brms)
 
+dir.create("../plots/", showWarnings = FALSE)
+
 # Model 1
 m <- read_rds("model1.rds")
 

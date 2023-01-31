@@ -3,6 +3,8 @@ library(tidyverse)
 library(brms)
 library(grid)
 
+dir.create("../plots/", showWarnings = FALSE)
+
 m_self <- read_rds("increase_over_self.rds")
 
 nd <- expand_grid(previous_accepted=c(T,F), session=1:16)

@@ -3,6 +3,8 @@ library(tidyverse)
 .blue <- "#27408B"
 .red <- "#CD3700"
 
+dir.create("../plots/", showWarnings = FALSE)
+
 # First plot model vs baseline by session
 
 nd <- read_csv("raising_by_first_offer_preds.csv")

@@ -1,3 +1,7 @@
+library(tidyverse)
+
+dir.create("../plots/", showWarnings = FALSE)
+
 d <- read_csv("../data/trial_level_data.csv")
 
 d %>%
