@@ -83,6 +83,7 @@ increase_data <- tibble(triad_id=character(),
 			session=integer(),
 			trial=integer(),
 			previous_accepted=logical(),
+			previous_winner=integer(),
 			previous_null=logical(),
 			consecutive_rejections=integer(),
 			increased_self=logical(),
@@ -119,6 +120,7 @@ for(triad in all_triads) {
 			matches_self <- own_offers[2:length(own_offers)] >= own_offers[1:(length(own_offers)-1)]
 			increases_winner <- own_offers[2:length(own_offers)] > winning_offers[1:(length(winning_offers)-1)]
 			matches_winner <- own_offers[2:length(own_offers)] >= winning_offers[1:(length(winning_offers)-1)]
+			previous_winner <- winning_offers[1:(length(winning_offers)-1)]
 			previous_accepted <- accepted[1:length(own_offers)-1]
 			previous_null <- is.na(winning_offers[1:length(winning_offers)-1])
 
@@ -142,6 +144,7 @@ for(triad in all_triads) {
 						 trial=2:length(own_offers),
 						 previous_accepted=accepted[1:length(own_offers)-1],
 						 previous_null=previous_null,
+						 previous_winner=previous_winner,
 						 consecutive_rejections = consec_rejections,
 						 increased_self=increases_self,
 						 matched_self=matches_self,
@@ -179,8 +182,26 @@ consecutive_data <- raw_data %>%
 	       second_proposer=if_else(type_trial == "cons_right", proposer_left, proposer_right),
 	       chose_first=(type_trial == "cons_left" & responder_choice_side == "L") | (type_trial == "cons_right" & responder_choice_side == "R")
 	       )
-
 stopifnot(nrow(simultaneous_data) + nrow(consecutive_data) == nrow(raw_data))
+
+consecutive_data$first_previously_accepted <- NA
+consecutive_data$second_previously_accepted <- NA
+for(i in 2:nrow(consecutive_data)) {
+	if(consecutive_data$trial[i] == 1 | consecutive_data$responder_choice_side[i-1] =="na") {
+		consecutive_data$first_previously_accepted[i] <- NA
+		consecutive_data$second_previously_accepted[i] <- NA
+	} else if(consecutive_data$second_proposer[i] == consecutive_data$proposer_left[i-1] & consecutive_data$responder_choice_side[i-1] == "L") {
+		consecutive_data$first_previously_accepted[i] <- F
+		consecutive_data$second_previously_accepted[i] <- T
+	} else if(consecutive_data$second_proposer[i] == consecutive_data$proposer_right[i-1] & consecutive_data$responder_choice_side[i-1] == "R") {
+		consecutive_data$first_previously_accepted[i] <- F
+		consecutive_data$second_previously_accepted[i] <- T
+	} else {
+		consecutive_data$first_previously_accepted[i] <- T
+		consecutive_data$second_previously_accepted[i] <- F
+	}
+}
+
 
 write_csv(simultaneous_data, "../data/simultaneous_data.csv")
 write_csv(consecutive_data, "../data/consecutive_data.csv")
