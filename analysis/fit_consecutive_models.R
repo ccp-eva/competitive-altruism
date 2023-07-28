@@ -62,6 +62,8 @@ for(i in 1:16) {
 	weight_s <- 0.75**i / N_sessions
 	full_empirical <- full_empirical + weight_s*session_empirical
 }
+tibble(offer=0:8, probability=as.numeric(full_empirical)) %>%
+	write_csv("estimated_offer_preferences.csv")
 
 first_offers <-  sample(0:8, size=10000, prob=full_empirical, replace=TRUE)
 second_offers <-  sample(0:8, size=10000, prob=full_empirical, replace=TRUE)
@@ -83,4 +85,4 @@ nd$upper <- colQuantiles(preds, probs=0.975)
 nd$above_chance <- colMeans(preds > 0.5)
 nd$below_chance <- colMeans(preds < 0.5)
 nd$model_higher <- colMeans(preds > matrix(rep(nd$baseline, 4000), nrow=4000, byrow=TRUE))
-write_csv(nd, "raising_by_first_offer_preds_new.csv")
+write_csv(nd, "raising_by_first_offer_preds.csv")
