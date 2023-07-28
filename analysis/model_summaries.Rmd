@@ -238,21 +238,56 @@ kable(per_session_probs, digits=2)
 ## Stratifying by first offer
 
 ```{r, include=FALSE}
-m_raises_by_first <- read_rds("second_raises_by_first.rds")
+m_raises_by_first <- read_rds("second_raises_by_first_and_prev.rds")
+prefs <- read_csv("estimated_offer_preferences.csv")
 nd <- read_csv("raising_by_first_offer_preds.csv")
 ```
 
+### Estimated offering preferences
+
+A probability distribution reflecting our estimate of proposer's preferred
+offers in the absence of competition was calculated on the basis of first offers
+in consecutive trials.  A distribution was calculated separately for sessions
+1 through 16 as follows.  In each session and for each possible offer, the
+proportion of observed offers in the 1st, 2nd, 3rd,..., 8th trial equal to that
+possible offer was computed.  The session probability for that offer was set
+to the weighted mean of these per-trial probabilities, with each trial receiving
+half the weight of the previous trial, i.e. 2nd trial data has half the weight
+of 1st trial data, 3rd trial data has half the weight of 2nd trial data, and so
+on.  Under this scheme, approximately 95% of the contribution to the estimate
+comes from the first half of session.  The 16 session distributions are then
+combined into a weighted mean where each session receives 3/4 the weight of
+the previous session, i.e. influence decays across sessions less steeply than
+across trials, since sessions are separated by a much longer time.  The table
+below shows both the final offering probabilities and the baseline outbidding
+probabilities estimated on the basis of 10,000 simulated trials of comparing
+"first" and "second" offers drawn from the preferred offer distribution.
+
+```{r}
+nd %>%
+  rename(offer=first_offer) %>%
+  right_join(prefs, by="offer") %>%
+  select(offer, probability, baseline) %>%
+  unique %>%
+  rename(Offer=offer, `Preference probability`=probability,
+         `Baseline outbiding probability`=baseline) %>%
+  kable(digits=2)
+```
+
 ### Outbidding probabilities in first session, stratified by first offer
+
 ```{r}
 pretty_session_predictions <- function(nd, s) {
   nd %>%
   filter(session==s) %>%
-  select(-session) %>%
+  select(-session, -below_chance) %>%
+  arrange(second_previously_accepted, first_offer) %>%
   rename(`First Offer`=first_offer,
+         `Previously accepted`=second_previously_accepted,
          `Posterior mean`=mean,
          `95% HPD lower`=lower,
          `95% HPD upper`=upper,
-         `Baseline outbidding rate`=baseline,
+         `Baseline`=baseline,
          `PP rate above basline`=model_higher,
          `PP rate above chance`=above_chance) %>%
   return
@@ -265,16 +300,4 @@ kable(pretty_session_predictions(nd, 1), digits=2)
 
 ```{r}
 kable(pretty_session_predictions(nd, 16), digits=2)
-```
-
-### Difference in outbidding probability between initial offers of 4 and 5
-
-```{r}
-nd <- expand_grid(session=16, first_offer=c(4, 5))
-preds <- plogis(posterior_linpred(m_raises_by_first, newdata=nd, re_formula=NA))
-contrast <- preds[,1] - preds[,2]
-contrast <- c(mean(contrast), quantile(contrast, probs=p95))
-names(contrast) <- pretty_col_names
-contrast <- as_tibble(t(contrast))
-kable(contrast, digits=2)
 ```
