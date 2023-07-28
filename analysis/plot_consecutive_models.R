@@ -7,7 +7,6 @@ library(brms)
 dir.create("../plots/", showWarnings = FALSE)
 
 # First plot model vs baseline by session
-
 nd <- read_csv("raising_by_first_offer_preds.csv")
 
 nd_long <- nd %>%
@@ -19,7 +18,7 @@ ggplot() +
 	geom_col(aes(x=first_offer, y=p, alpha=posterior), color=NA, data=filter(nd_long, type=="mean"), fill=.red, position="dodge") +
 	geom_line(aes(x=first_offer, y=p, colour=type), data=filter(nd_long, type=="baseline")) +
 	geom_hline(yintercept=0.5, linetype="dotted") +
-	facet_wrap(~session, ncol=4, nrow=4) +
+	facet_grid(second_previously_accepted ~session) + #, ncol=4, nrow=4) +
 	scale_color_manual(name = "type", values = c("baseline" = .blue, "mean" = .red)) +
 	ylim(c(0, 1)) +
   theme(axis.title.y = element_text(size = rel(1.3), angle = 90)) +
