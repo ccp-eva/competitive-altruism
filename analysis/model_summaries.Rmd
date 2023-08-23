@@ -239,6 +239,7 @@ kable(per_session_probs, digits=2)
 
 ```{r, include=FALSE}
 m_raises_by_first <- read_rds("second_raises_by_first_and_prev.rds")
+draws <- as_draws_df(m_raises_by_first)
 prefs <- read_csv("estimated_offer_preferences.csv")
 nd <- read_csv("raising_by_first_offer_preds.csv")
 ```
@@ -272,6 +273,20 @@ nd %>%
   rename(Offer=offer, `Preference probability`=probability,
          `Baseline outbiding probability`=baseline) %>%
   kable(digits=2)
+```
+
+### Posterior probability that second proposer becomes more likely to outbid first proposer as sessions increase
+
+#### With previous offer rejected:
+
+```{r}
+print(mean(draws$b_session >0))
+```
+
+#### With previous offer accepted:
+
+```{r}
+print(mean(draws$b_session + draws$`b_second_previously_acceptedTRUE:session` > 0))
 ```
 
 ### Outbidding probabilities in first session, stratified by first offer
