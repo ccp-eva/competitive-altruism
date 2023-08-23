@@ -22,6 +22,8 @@ pretty_col_names <- c("Posterior mean",
                       "95% HPD upper")
 
 opts_chunk$set(echo=FALSE)
+
+set.seed(1234)
 ```
 
 # Pre-registered models of total proportional offer
