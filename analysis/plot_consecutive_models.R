@@ -11,22 +11,33 @@ nd <- read_csv("raising_by_first_offer_preds.csv")
 
 nd_long <- nd %>%
 	pivot_longer(cols=c("baseline", "mean"), names_to="type", values_to="p") %>%
-	mutate(posterior=if_else(type=="baseline", 1, model_higher))
+	mutate(posterior=if_else(type=="baseline", 1, model_higher),
+	       pretty_prev = if_else(second_previously_accepted, "Previously accepted", "Previously rejected"))
+
+nd_prev_accept <- filter(nd_long, second_previously_accepted==TRUE)
+nd_prev_reject <- filter(nd_long, second_previously_accepted==FALSE)
+
+common_theme <- theme_bw() +
+	theme(plot.title = element_text(size = rel(3), hjust=0.5)) +
+	theme(axis.title.y = element_text(size = rel(2), angle = 90)) +
+	theme(axis.title.x = element_text(size = rel(2), angle = 00)) +
+	theme(axis.text = element_text(size = rel(1.5))) +
+	theme(legend.title = element_text(size = rel(2))) +
+	theme(legend.text = element_text(size = rel(1.5))) +
+	theme(strip.text = element_text(size = rel(2)))
 
 ggplot() +
-	geom_col(aes(x=first_offer, y=p, colour=type), data=filter(nd_long, type=="mean"), fill="white", position="dodge") +
-	geom_col(aes(x=first_offer, y=p, alpha=posterior), color=NA, data=filter(nd_long, type=="mean"), fill=.red, position="dodge") +
-	geom_line(aes(x=first_offer, y=p, colour=type), data=filter(nd_long, type=="baseline")) +
+	geom_col(aes(x=first_offer, y=p), colour="black", data=filter(nd_long, type=="mean"), fill="white", position="dodge") +
+	geom_col(aes(x=first_offer, y=p, fill=posterior), color=NA, data=filter(nd_long, type=="mean"), position="dodge") +
+	scale_fill_gradientn(colours=viridis(256, option="D", direction=1)) +
+	geom_line(aes(x=first_offer, y=p), colour="black", linewidth=1.5, data=filter(nd_long, type=="baseline")) +
 	geom_hline(yintercept=0.5, linetype="dotted") +
-	facet_grid(second_previously_accepted ~session) + #, ncol=4, nrow=4) +
-	scale_color_manual(name = "type", values = c("baseline" = .blue, "mean" = .red)) +
+	facet_grid(pretty_prev~session) +
 	ylim(c(0, 1)) +
-  theme(axis.title.y = element_text(size = rel(1.3), angle = 90)) +
-  theme(axis.title.x = element_text(size = rel(1.3), angle = 00)) +
-  theme(axis.text=element_text(size=12)) +
-  ylab("probability to outcompete 1st offers") +
-  xlab("first offer value") +
-  theme_bw()
+	ylab("Probability to outcompete 1st offers") +
+	xlab("First offer value") +
+#	ggtitle("Posterior mean outbidding probabilities for a previously accepted second proposer") +
+	common_theme
 ggsave("../plots/raising_by_first_offer_by_session.png")
 
 # Next plot raw data vs model, collapsing sessions
