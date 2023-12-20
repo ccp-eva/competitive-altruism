@@ -7,8 +7,9 @@ dir.create("../plots/", showWarnings = FALSE)
 
 m_self <- read_rds("increase_over_self.rds")
 
-nd <- expand_grid(previous_accepted=c(T,F), session=1:16)
+nd <- expand_grid(previous_accepted=c(-0.5,0.5), session=1:16)
 preds <- plogis(posterior_linpred(m_self, newdata=nd, re_formula=NA))
+nd$previous_accepted <- nd$previous_accepted > 0
 nd$mean_p <- colMeans(preds)
 nd$lower_p <- colQuantiles(preds, p=0.025)
 nd$upper_p <- colQuantiles(preds, p=0.975)
@@ -17,8 +18,7 @@ nd = mutate(nd, previous_accepted=replace(previous_accepted, previous_accepted==
   mutate(previous_accepted=replace(previous_accepted, previous_accepted==TRUE, "accepted")) 
 
 
-nd
-plot <-ggplot(nd, aes(x=session)) +
+plot <- ggplot(nd, aes(x=session)) +
   geom_line(aes(y=mean_p, colour=previous_accepted)) +
   scale_color_manual(values = c("rejected" = "#f97b36", "accepted"= "#c155a4")) +
   geom_ribbon(aes(ymin=lower_p, ymax=upper_p, fill=previous_accepted), alpha=0.5) +
@@ -41,8 +41,9 @@ ggsave("../plots/increase_over_self.png")
 
 m_winner <- read_rds("increase_over_winner.rds")
 
-nd <- expand_grid(previous_accepted=c(T,F), session=1:16)
+nd <- expand_grid(previous_accepted=c(-0.5,0.5), session=1:16)
 preds <- plogis(posterior_linpred(m_winner, newdata=nd, re_formula=NA))
+nd$previous_accepted <- nd$previous_accepted > 0
 nd = mutate(nd, previous_accepted=replace(previous_accepted, previous_accepted==FALSE, "rejected")) %>%
   mutate(previous_accepted=replace(previous_accepted, previous_accepted==TRUE, "accepted"))
 nd$mean_p <- colMeans(preds)

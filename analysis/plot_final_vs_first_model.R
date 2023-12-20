@@ -1,13 +1,15 @@
 library(matrixStats)
 library(tidyverse)
 library(brms)
+library(grid)
 
 dir.create("../plots/", showWarnings = FALSE)
 
-m <- read_rds( "first_last.rds")
+m <- read_rds("first_last.rds")
 
-nd <- expand_grid(game_type=c("dyadic", "triadic"), session=1:16)
+nd <- expand_grid(game_type=c(-0.5, 0.5), session=1:16)
 preds <- posterior_linpred(m, newdata=nd, re_formula=NA) 
+nd$game_type <- if_else(nd$game_type < 0, "dyadic", "triadic")
 
 dyadic_probs <- plogis(preds[,1:16])
 mean(dyadic_probs)
