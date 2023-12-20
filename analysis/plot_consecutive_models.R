@@ -45,7 +45,7 @@ ggsave("../plots/raising_by_first_offer_by_session.png")
 
 d <- read_csv("../data/consecutive_data.csv") %>%
 	mutate(raises = second_offer > first_offer) %>%
-	group_by(first_offer, second_proposer) %>%
+	group_by(first_offer, second_proposer_id) %>%
 	summarise(p=mean(raises), N=length(raises))
 
 nd2 <- nd %>%
