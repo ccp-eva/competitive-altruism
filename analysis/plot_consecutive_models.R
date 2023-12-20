@@ -1,5 +1,6 @@
 library(tidyverse)
 library(brms)
+library(viridis)
 
 .blue <- "#27408B"
 .red <- "#CD3700"
