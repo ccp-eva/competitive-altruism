@@ -80,6 +80,7 @@ write_csv(combined, "../data/session_level_data.csv")
 # offer increasing behaviour
 increase_data <- tibble(triad_id=character(),
 			proposer_id=character(),
+			responder_id=character(),
 			session=integer(),
 			trial=integer(),
 			previous_accepted=logical(),
@@ -98,20 +99,18 @@ for(triad in all_triads) {
 	proposers <- unique(triad_d$proposer_id)
 	for(proposer in proposers) {
 		for(s in 1:16) {
+			# Extract sub-data for this proposer and session
+			session_d <- triad_d %>%
+				filter(proposer_id==proposer, session==s) %>%
+				arrange(trial)
+			# Identify responder
+			responder <- unique(session_d$responder_id)
+			stopifnot(length(responder) <= 1)
 			# Extract offer data for this proposer in this session
-			own_offers <- triad_d %>%
-				filter(proposer_id==proposer, session==s) %>%
-				arrange(trial) %>%
-				pull(offer)
-			winning_offers <- triad_d %>%
-				filter(proposer_id==proposer, session==s) %>%
-				arrange(trial) %>%
-				pull(winning_offer)
+			own_offers <- session_d %>% pull(offer)
+			winning_offers <- session_d %>% pull(winning_offer)
 			stopifnot(length(own_offers) == length(winning_offers))
-			accepted <- triad_d %>%
-				filter(proposer_id==proposer, session==s) %>%
-				arrange(trial) %>%
-				pull(accepted)
+			accepted <- session_d %>% pull(accepted)
 
 			# Skip cases where no offers were made
 			if(length(own_offers) == 0) { next }
@@ -139,7 +138,7 @@ for(triad in all_triads) {
 
 			# Add row to main table
 			increase_data <- add_row(increase_data,
-						 triad_id=triad, proposer_id=proposer,
+						 triad_id=triad, proposer_id=proposer, responder_id=responder,
 						 session=s,
 						 trial=2:length(own_offers),
 						 previous_accepted=accepted[1:length(own_offers)-1],
@@ -166,6 +165,7 @@ raw_data <- read_csv("../data/competitive_altruism_dataset.csv") %>%
 	select(dyad, proposer_L, proposer_right, responder,
 	       session, trial, condition_tri_di, type_trial,
 	       offer_left, offer_right, responder_choice_side) %>%
+        rename(responder_id = responder) %>%
 	filter(condition_tri_di == "triadic") %>%
 	mutate(offer_left=as.integer(offer_left),
 	       offer_right=as.integer(offer_right))
@@ -178,8 +178,8 @@ consecutive_data <- raw_data %>%
 	       triad_id = dyad) %>%
 	mutate(first_offer=if_else(type_trial == "cons_left", offer_left, offer_right),
 	       second_offer=if_else(type_trial == "cons_right", offer_left, offer_right),
-	       first_proposer=if_else(type_trial == "cons_left", proposer_left, proposer_right),
-	       second_proposer=if_else(type_trial == "cons_right", proposer_left, proposer_right),
+	       first_proposer_id=if_else(type_trial == "cons_left", proposer_left, proposer_right),
+	       second_proposer_id=if_else(type_trial == "cons_right", proposer_left, proposer_right),
 	       chose_first=(type_trial == "cons_left" & responder_choice_side == "L") | (type_trial == "cons_right" & responder_choice_side == "R")
 	       )
 stopifnot(nrow(simultaneous_data) + nrow(consecutive_data) == nrow(raw_data))
@@ -190,10 +190,10 @@ for(i in 2:nrow(consecutive_data)) {
 	if(consecutive_data$trial[i] == 1 | consecutive_data$responder_choice_side[i-1] =="na") {
 		consecutive_data$first_previously_accepted[i] <- NA
 		consecutive_data$second_previously_accepted[i] <- NA
-	} else if(consecutive_data$second_proposer[i] == consecutive_data$proposer_left[i-1] & consecutive_data$responder_choice_side[i-1] == "L") {
+	} else if(consecutive_data$second_proposer_id[i] == consecutive_data$proposer_left[i-1] & consecutive_data$responder_choice_side[i-1] == "L") {
 		consecutive_data$first_previously_accepted[i] <- F
 		consecutive_data$second_previously_accepted[i] <- T
-	} else if(consecutive_data$second_proposer[i] == consecutive_data$proposer_right[i-1] & consecutive_data$responder_choice_side[i-1] == "R") {
+	} else if(consecutive_data$second_proposer_id[i] == consecutive_data$proposer_right[i-1] & consecutive_data$responder_choice_side[i-1] == "R") {
 		consecutive_data$first_previously_accepted[i] <- F
 		consecutive_data$second_previously_accepted[i] <- T
 	} else {
