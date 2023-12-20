@@ -95,8 +95,7 @@ kable(contrast, digits=2)
 ```{r}
 m_first_last <- read_rds("first_last.rds")
 preds <- plogis(posterior_linpred(m_first_last, re_formula=NA,
-				  newdata=expand_grid(game_type=c("dyadic", "triadic"), session=1:16)))
-
+				  newdata=expand_grid(game_type=c(-0.5, 0.5), session=1:16)))
 marginal_dyadic_probs <- as.vector(preds)[1:64000]
 marginal_triadic_probs <- as.vector(preds)[64001:128000]
 ```
@@ -142,7 +141,7 @@ kable(x, digits=2)
 ```{r}
 m_self <- read_rds("increase_over_self.rds")
 preds <- plogis(posterior_linpred(m_self, re_formula=NA,
-			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(TRUE, FALSE),
+			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(-0.5, 0.5),
 					       session=1:16)))
 ```
 
@@ -174,7 +173,7 @@ kable(as_tibble(t(contrast)), digits=2)
 ```{r}
 m_winner <- read_rds("increase_over_winner.rds")
 preds <- plogis(posterior_linpred(m_winner, re_formula=NA,
-			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(TRUE, FALSE),
+			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(-0.5, 0.5),
 					       session=1:16)))
 ```
 
@@ -243,7 +242,8 @@ kable(per_session_probs, digits=2)
 m_raises_by_first <- read_rds("second_raises_by_first_and_prev.rds")
 draws <- as_draws_df(m_raises_by_first)
 prefs <- read_csv("estimated_offer_preferences.csv")
-nd <- read_csv("raising_by_first_offer_preds.csv")
+nd <- read_csv("raising_by_first_offer_preds.csv") %>%
+	select(-previously_accepted)
 ```
 
 ### Estimated offering preferences
@@ -288,7 +288,7 @@ print(mean(draws$b_session >0))
 #### With previous offer accepted:
 
 ```{r}
-print(mean(draws$b_session + draws$`b_second_previously_acceptedTRUE:session` > 0))
+print(mean(draws$b_session + draws$`b_previously_accepted:session` > 0))
 ```
 
 ### Outbidding probabilities in first session, stratified by first offer
