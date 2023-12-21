@@ -7,9 +7,10 @@ dir.create("../plots/", showWarnings = FALSE)
 
 m_self <- read_rds("increase_over_self.rds")
 
-nd <- expand_grid(previous_accepted=c(-0.5,0.5), session=1:16)
+nd <- expand_grid(previous_accepted=c(-0.5,0.5), session=1:16 - 8.5)
 preds <- plogis(posterior_linpred(m_self, newdata=nd, re_formula=NA))
 nd$previous_accepted <- nd$previous_accepted > 0
+nd$session <- nd$session + 8.5
 nd$mean_p <- colMeans(preds)
 nd$lower_p <- colQuantiles(preds, p=0.025)
 nd$upper_p <- colQuantiles(preds, p=0.975)
@@ -37,13 +38,15 @@ plot <- ggplot(nd, aes(x=session)) +
   theme(legend.title=element_text(size=11))
 plot  
 grid.text("1b",0.8, 0.965)
-ggsave("../plots/increase_over_self.png")
+ggsave("../plots/increase_over_self.png",
+       width = 105, height = 105, units="mm", dpi=600)
 
 m_winner <- read_rds("increase_over_winner.rds")
 
-nd <- expand_grid(previous_accepted=c(-0.5,0.5), session=1:16)
+nd <- expand_grid(previous_accepted=c(-0.5,0.5), session=1:16 - 8.5)
 preds <- plogis(posterior_linpred(m_winner, newdata=nd, re_formula=NA))
 nd$previous_accepted <- nd$previous_accepted > 0
+nd$session <- nd$session + 8.5
 nd = mutate(nd, previous_accepted=replace(previous_accepted, previous_accepted==FALSE, "rejected")) %>%
   mutate(previous_accepted=replace(previous_accepted, previous_accepted==TRUE, "accepted"))
 nd$mean_p <- colMeans(preds)

@@ -7,9 +7,10 @@ dir.create("../plots/", showWarnings = FALSE)
 
 m <- read_rds("first_last.rds")
 
-nd <- expand_grid(game_type=c(-0.5, 0.5), session=1:16)
+nd <- expand_grid(game_type=c(-0.5, 0.5), session=1:16 - 8.5)
 preds <- posterior_linpred(m, newdata=nd, re_formula=NA) 
 nd$game_type <- if_else(nd$game_type < 0, "dyadic", "triadic")
+nd$session <- nd$session + 8.5
 
 dyadic_probs <- plogis(preds[,1:16])
 mean(dyadic_probs)
@@ -30,7 +31,7 @@ ggplot(nd, aes(x=session)) +
 	geom_hline(yintercept=0.5, linetype="dotted")
 ggsave("../plots/increase_probabilities.png")
 
-diff_pred <- matrix(, nrow=4000, ncol=16)
+diff_pred <- matrix(, nrow=dim(preds)[1], ncol=16)
 for(i in 1:16) {
 	diff_pred[,i] <- plogis(preds[,i+16]) - plogis(preds[,i])
 }

@@ -34,10 +34,10 @@ set.seed(1234)
 m1 <- read_rds("model1.rds")
 preds <- posterior_predict(m1,re_formula=NA,
 			   newdata=expand_grid(game_type=c("dyadic", "triadic"),
-					       session=8))
+					       session=0))
 ```
 
-### Posterior predictive distribution for total proportional offers in 8th session
+### Posterior predictive distribution for total proportional offers in "8.5th" session
 
 ```{r}
 condition_values <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
@@ -46,7 +46,7 @@ rownames(condition_values) <- c("Dyadic", "Triadic")
 kable(condition_values, digits=2)
 ```
 
-### Posterior predictive distribution for difference in total proportional offers in 8th session
+### Posterior predictive distribution for difference in total proportional offers in "8.5th" session
 
 ```{r}
 contrast <- preds[,2] - preds[,1]
@@ -63,9 +63,9 @@ m2 <- read_rds("model2.rds")
 draws <- as_draws_df(m2)
 preds <- posterior_predict(m2,re_formula=NA,
 			   newdata=expand_grid(game_type=c("triadic"), consec=c(-0.5, 0.5),
-					       session=8))
+					       session=0))
 ```
-### Posterior predictive distribution for total proportional offers in 8th triadic session
+### Posterior predictive distribution for total proportional offers in "8.5th" triadic session
 
 ```{r}
 consec_values <- cbind(colMeans(preds), colQuantiles(preds, probs=p95))
@@ -95,9 +95,10 @@ kable(contrast, digits=2)
 ```{r}
 m_first_last <- read_rds("first_last.rds")
 preds <- plogis(posterior_linpred(m_first_last, re_formula=NA,
-				  newdata=expand_grid(game_type=c(-0.5, 0.5), session=1:16)))
-marginal_dyadic_probs <- as.vector(preds)[1:64000]
-marginal_triadic_probs <- as.vector(preds)[64001:128000]
+				  newdata=expand_grid(game_type=c(-0.5, 0.5), session=1:16 - 8.5)))
+pivot <- (dim(preds)[1] * dim(preds)[2]) /2
+marginal_dyadic_probs <- as.vector(preds)[1:pivot]
+marginal_triadic_probs <- as.vector(preds)[(pivot+1):(2*pivot)]
 ```
 
 ### Marginalised over session probabilities of increasing within a session
@@ -142,14 +143,15 @@ kable(x, digits=2)
 m_self <- read_rds("increase_over_self.rds")
 preds <- plogis(posterior_linpred(m_self, re_formula=NA,
 			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(-0.5, 0.5),
-					       session=1:16)))
+					       session=1:16 - 8.5)))
 ```
 
 ### Marginalised over sessions
 
 ```{r}
-marginal_accepted_probs <- as.vector(preds)[1:64000]
-marginal_rejected_probs <- as.vector(preds)[64001:128000]
+pivot <- (dim(preds)[1] * dim(preds)[2]) / 2
+marginal_rejected_probs <- as.vector(preds)[1:pivot]
+marginal_accepted_probs <- as.vector(preds)[(pivot+1):(2*pivot)]
 
 accepted_sum <- c(mean(marginal_accepted_probs), quantile(marginal_accepted_probs, probs=p95))
 rejected_sum <- c(mean(marginal_rejected_probs), quantile(marginal_rejected_probs, probs=p95))
@@ -174,14 +176,15 @@ kable(as_tibble(t(contrast)), digits=2)
 m_winner <- read_rds("increase_over_winner.rds")
 preds <- plogis(posterior_linpred(m_winner, re_formula=NA,
 			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(-0.5, 0.5),
-					       session=1:16)))
+					       session=1:16 - 8.5)))
 ```
 
 ### Marginalised over sessions
 
 ```{r}
-marginal_accepted_probs <- as.vector(preds)[1:64000]
-marginal_rejected_probs <- as.vector(preds)[64001:128000]
+pivot <- (dim(preds)[1] * dim(preds)[2]) / 2
+marginal_rejected_probs <- as.vector(preds)[1:pivot]
+marginal_accepted_probs <- as.vector(preds)[(pivot+1):(2*pivot)]
 
 accepted_sum <- c(mean(marginal_accepted_probs), quantile(marginal_accepted_probs, probs=p95))
 rejected_sum <- c(mean(marginal_rejected_probs), quantile(marginal_rejected_probs, probs=p95))
@@ -209,7 +212,7 @@ kable(as_tibble(t(contrast)), digits=2)
 ```{r}
 m_raises <- read_rds("second_raises.rds")
 draws <- as_draws_df(m_raises)
-preds <- plogis(posterior_linpred(m_raises, newdata=tibble(session=1:16), re_formula=NA))
+preds <- plogis(posterior_linpred(m_raises, newdata=tibble(session=1:16 - 8.5), re_formula=NA))
 ```
 
 ### Posterior probability that second proposer becomes more likely to outbid first proposer as sessions increase
