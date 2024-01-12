@@ -35,9 +35,9 @@ plot <- ggplot(nd, aes(x=session)) +
   theme(axis.title.x = element_text(size = rel(1.3), angle = 00)) +
   theme(axis.text=element_text(size=12)) +
   theme(legend.text=element_text(size=11)) +
-  theme(legend.title=element_text(size=11))
+  theme(legend.title=element_text(size=11)) +
+  grid.text("1b",0.8, 0.965)
 plot  
-grid.text("1b",0.8, 0.965)
 ggsave("../plots/increase_over_self.png",
        width = 105, height = 105, units="mm", dpi=600)
 
@@ -57,4 +57,5 @@ ggplot(nd, aes(x=session)) +
 	geom_ribbon(aes(ymin=lower_p, ymax=upper_p, fill=previous_accepted), alpha=0.5) +
 	ylim(0, 1) +
 	geom_hline(yintercept=0.5, linetype="dashed")
-ggsave("../plots/increase_over_winner.png")
+ggsave("../plots/increase_over_winner.png",
+       width = 105, height = 105, units="mm", dpi=600)

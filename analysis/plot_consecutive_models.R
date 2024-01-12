@@ -19,19 +19,20 @@ nd_prev_accept <- filter(nd_long, second_previously_accepted==TRUE)
 nd_prev_reject <- filter(nd_long, second_previously_accepted==FALSE)
 
 common_theme <- theme_bw() +
-	theme(plot.title = element_text(size = rel(3), hjust=0.5)) +
-	theme(axis.title.y = element_text(size = rel(2), angle = 90)) +
-	theme(axis.title.x = element_text(size = rel(2), angle = 00)) +
-	theme(axis.text = element_text(size = rel(1.5))) +
-	theme(legend.title = element_text(size = rel(2))) +
-	theme(legend.text = element_text(size = rel(1.5))) +
-	theme(strip.text = element_text(size = rel(2)))
+	theme(plot.title = element_text(size = rel(1), hjust=0.5)) +
+	theme(axis.title.y = element_text(size = rel(0.75), angle = 90)) +
+	theme(axis.title.x = element_text(size = rel(0.75), angle = 00)) +
+	theme(axis.text = element_text(size = rel(0.5))) +
+	theme(legend.title = element_text(size = rel(0.75))) +
+	theme(legend.text = element_text(size = rel(0.5))) +
+	theme(strip.text = element_text(size = rel(0.75)))
 
 ggplot() +
 	geom_col(aes(x=first_offer, y=p), colour="black", data=filter(nd_long, type=="mean"), fill="white", position="dodge") +
 	geom_col(aes(x=first_offer, y=p, fill=posterior), color=NA, data=filter(nd_long, type=="mean"), position="dodge") +
-	scale_fill_gradientn(colours=viridis(256, option="D", direction=1)) +
-	geom_line(aes(x=first_offer, y=p), colour="black", linewidth=1.5, data=filter(nd_long, type=="baseline")) +
+	scale_fill_gradientn(colours=viridis(256, option="D", direction=1),
+			     name = "Posterior\nprob. that\nrate\nexceeds\nbaseline") +
+	geom_line(aes(x=first_offer, y=p), colour="black", linewidth=0.75, data=filter(nd_long, type=="baseline")) +
 	geom_hline(yintercept=0.5, linetype="dotted") +
 	facet_grid(pretty_prev~session) +
 	ylim(c(0, 1)) +
@@ -39,7 +40,8 @@ ggplot() +
 	xlab("First offer value") +
 #	ggtitle("Posterior mean outbidding probabilities for a previously accepted second proposer") +
 	common_theme
-ggsave("../plots/raising_by_first_offer_by_session.png")
+ggsave("../plots/raising_by_first_offer_by_session.png",
+       width = 210, height = 210/1.5, units="mm", dpi=600)
 
 # Next plot raw data vs model, collapsing sessions
 
@@ -57,4 +59,5 @@ ggplot(data=nd2, mapping=aes(x=first_offer)) +
 	geom_line(aes(y=baseline), colour=.blue, size=2) +
 	geom_jitter(data=d, aes(y=p, size=N)) +
 	geom_hline(yintercept=0.5, linetype="dotted")
-ggsave("../plots/raising_by_first_offer_no_sessions_with_data.png")
+ggsave("../plots/raising_by_first_offer_no_sessions_with_data.png",
+       width = 105, height = 105, units="mm", dpi=600)

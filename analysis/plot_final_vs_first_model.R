@@ -29,7 +29,8 @@ ggplot(nd, aes(x=session)) +
 	geom_line(aes(y=mean_p, colour=game_type)) +
 	geom_ribbon(aes(ymin=lower_p, ymax=upper_p, fill=game_type), alpha=0.25) +
 	geom_hline(yintercept=0.5, linetype="dotted")
-ggsave("../plots/increase_probabilities.png")
+ggsave("../plots/increase_probabilities.png",
+       width = 105, height = 105, units="mm", dpi=600)
 
 diff_pred <- matrix(, nrow=dim(preds)[1], ncol=16)
 for(i in 1:16) {
@@ -53,4 +54,5 @@ ggplot(dd, aes(x=session) ) +
   theme(axis.text=element_text(size=12))
 
 grid.text("1a",0.975, 0.965)
-ggsave("../plots/increase_probabilities_diff.png")
+ggsave("../plots/increase_probabilities_diff.png",
+       width = 105, height = 105, units="mm", dpi=600)

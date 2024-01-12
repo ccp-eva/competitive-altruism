@@ -17,6 +17,7 @@ library(brms)
 
 p95 <- c(0.025, 0.975)
 
+
 pretty_col_names <- c("Posterior mean",
                       "95% HPD lower",
                       "95% HPD upper")
@@ -25,6 +26,8 @@ opts_chunk$set(echo=FALSE)
 
 set.seed(1234)
 ```
+
+NB: Throughout, predictions for the "8.5th" session refer to those obtained with the centered session number predictor set to zero.  Because the total number of sessions is even, this does not directly correspond to any particular actual experimetnal session.  Nevertheless, it faithly represents expected performance "half way through" any inferred learning effects.
 
 # Pre-registered models of total proportional offer
 
@@ -74,6 +77,8 @@ rownames(consec_values) <- c("Simultaneous", "Consecutive")
 kable(consec_values, digits=2)
 ```
 
+\newpage
+
 Posterior probability that mean consecutive offer is higher than mean simulteanous offer:
 
 ```{r}
@@ -88,7 +93,6 @@ names(contrast) <- pretty_col_names
 contrast <- as_tibble(t(contrast))
 kable(contrast, digits=2)
 ```
-\newpage
 
 # Models of tendency for final offfers to exceed initial offers within sessions
 
@@ -121,6 +125,8 @@ per_session_probs <- cbind(rep(1:16,2), colMeans(preds), colQuantiles(preds, pro
 colnames(per_session_probs) <- c("Session", pretty_col_names)
 kable(per_session_probs[1:16,], digits=2)
 ```
+\newpage
+
 #### Triadic
 ```{r}
 kable(per_session_probs[17:32,], digits=2)
@@ -132,6 +138,18 @@ kable(per_session_probs[17:32,], digits=2)
 contrast <- preds[,17:32] - preds[,1:16]
 x <- cbind(1:16, colMeans(contrast), colQuantiles(contrast, probs=p95))
 colnames(x) <-  c("Session", pretty_col_names)
+kable(x, digits=2)
+```
+
+### Per-triad contrast in probabilities (traidic - dyadic) in "8.5th" session
+
+```{r}
+triads <- unique(m_first_last$data$triad_id)
+nd <- expand_grid(game_type=c(-0.5, 0.5), session=0, triad_id=triads)
+preds <- plogis(posterior_linpred(m_first_last, newdata=nd))
+contrast <- preds[,8:14] - preds[,1:7]
+x <- tibble(Triad=triads, `Posterior mean`=colMeans(contrast),
+            `Post. prob. of positive contrast` = colMeans(contrast > 0))
 kable(x, digits=2)
 ```
 
@@ -170,10 +188,62 @@ names(contrast) <- pretty_col_names
 kable(as_tibble(t(contrast)), digits=2)
 ```
 
-## Relative to previous trial winner
+### Per-proposer and responder accepted vs rejected contrasts in "8.5th" session
 
 ```{r}
-m_winner <- read_rds("increase_over_winner.rds")
+nd <- m_self$data %>% select(proposer_id, responder_id) %>% unique
+nd$session <- 0
+nd$previous_accepted <- -0.5
+rejected_preds <- plogis(posterior_linpred(m_self, newdata=nd))
+nd$previous_accepted <- 0.5
+accepted_preds <- plogis(posterior_linpred(m_self, newdata=nd))
+contrast <- accepted_preds - rejected_preds
+x <- tibble(Proposer = nd$proposer_id, Responder = nd$responder_id,
+	    `Posterior mean` = colMeans(contrast),
+	    `Post. prob. of negative contrast` = colMeans(contrast < 0))
+kable(arrange(x, Proposer, Responder), digits=2)
+```
+
+### Separating consecutive and simultaneous trials
+
+#### Posterior probability of higher increasing probability in consecutive trials than simultaneous
+
+```{r}
+m_consim <- read_rds("increase_over_self_consim.rds")
+draws <- as_draws_df(m_consim)
+mean(draws$b_type_trial > 0)
+```
+
+#### Posterior probability of increasing offers for different trial types
+
+```{r}
+sim_accepted_preds <- plogis(posterior_linpred(m_consim, re_formula=NA, newdata=expand_grid(type_trial=-0.5, previous_accepted=0.5, session=1:16 - 8.5)))
+sim_rejected_preds <- plogis(posterior_linpred(m_consim, re_formula=NA, newdata=expand_grid(type_trial=-0.5, previous_accepted=-0.5, session=1:16 - 8.5)))
+con_accepted_preds <- plogis(posterior_linpred(m_consim, re_formula=NA, newdata=expand_grid(type_trial=0.5, previous_accepted=0.5, session=1:16 - 8.5)))
+con_rejected_preds <- plogis(posterior_linpred(m_consim, re_formula=NA, newdata=expand_grid(type_trial=0.5, previous_accepted=-0.5, session=1:16 - 8.5)))
+x <- tibble(`Previous offer`=rep(c("Accepted", "Rejected"), 2),
+	    `Trial type`=rep(c("Triadic simultaneous", "Triadic consecutive"), each=2),
+	    `Posterior mean` = c(mean(sim_accepted_preds),
+	                         mean(sim_rejected_preds),
+	                         mean(con_accepted_preds),
+	                         mean(con_rejected_preds)),
+            `95% HPD lower` =  c(quantile(sim_accepted_preds, probs=0.025),
+	                         quantile(sim_rejected_preds, probs=0.025),
+	                         quantile(con_accepted_preds, probs=0.025),
+	                         quantile(con_rejected_preds, probs=0.025)),
+            `95% HPD upper` =  c(quantile(sim_accepted_preds, probs=0.975),
+	                         quantile(sim_rejected_preds, probs=0.975),
+	                         quantile(con_accepted_preds, probs=0.975),
+	                         quantile(con_rejected_preds, probs=0.975)))
+kable(arrange(x, `Previous offer`, `Trial type`), digits=2)
+```
+
+## Relative to previous trial winner
+
+NB: here we consider increasing over *or* matching the previous winner.
+
+```{r}
+m_winner <- read_rds("match_winner.rds")
 preds <- plogis(posterior_linpred(m_winner, re_formula=NA,
 			   newdata=expand_grid(game_type=c("triadic"), previous_accepted=c(-0.5, 0.5),
 					       session=1:16 - 8.5)))
@@ -193,8 +263,6 @@ colnames(x) <- pretty_col_names
 rownames(x) <- c("Previous offer accepted", "Previous offer rejected")
 kable(x, digits=2)
 ```
-
-\newpage
 
 ### Accepted vs rejected contrast
 
@@ -218,7 +286,7 @@ preds <- plogis(posterior_linpred(m_raises, newdata=tibble(session=1:16 - 8.5), 
 ### Posterior probability that second proposer becomes more likely to outbid first proposer as sessions increase
 
 ```{r}
-print(mean(draws$b_session >0))
+print(mean(draws$b_session > 0))
 ```
 
 ### Probability that second proposer offers more than first proposer in consecutive trials, marginalising over sessions
@@ -229,12 +297,28 @@ names(marginalised_probs) <- pretty_col_names
 kable(as_tibble(t(marginalised_probs)), digits=2)
 ```
 
+\newpage
+
 ### Per session probabilities that second proposer offers more than first proposer in consecutive trials
 
 ```{r}
 per_session_probs <- cbind(1:16, colMeans(preds), colQuantiles(preds, probs=p95))
 colnames(per_session_probs) <- c("Session", pretty_col_names)
 kable(per_session_probs, digits=2)
+```
+
+### Per second proposer and responder probabilities that second proposer offers more than first proposer in consecutive trials for "8.5th" session
+
+```{r}
+nd <- m_raises$data %>% select(second_proposer_id, responder_id) %>% unique
+nd$session <- 0
+outbid_probs <- plogis(posterior_linpred(m_raises, newdata=nd))
+nd$session <- NULL
+nd$mean <- colMeans(outbid_probs)
+nd$lower <- colQuantiles(outbid_probs, p=0.025)
+nd$upper <- colQuantiles(outbid_probs, p=0.975)
+colnames(nd) <- c("Second proposer", "Responder", pretty_col_names)
+kable(arrange(nd, `Second proposer`, Responder), digits=2)
 ```
 
 \newpage
@@ -294,6 +378,8 @@ print(mean(draws$b_session >0))
 print(mean(draws$b_session + draws$`b_previously_accepted:session` > 0))
 ```
 
+\newpage
+
 ### Outbidding probabilities in first session, stratified by first offer
 
 ```{r}
@@ -308,7 +394,7 @@ pretty_session_predictions <- function(nd, s) {
          `95% HPD lower`=lower,
          `95% HPD upper`=upper,
          `Baseline`=baseline,
-         `PP rate above basline`=model_higher,
+         `PP rate above baseline`=model_higher,
          `PP rate above chance`=above_chance) %>%
   return
 }
@@ -320,4 +406,88 @@ kable(pretty_session_predictions(nd, 1), digits=2)
 
 ```{r}
 kable(pretty_session_predictions(nd, 16), digits=2)
+```
+
+\newpage
+
+### Per second proposer and per responder posterior predictions on outbidding initial offers of 1, 2, 3 or 4 in final session
+
+#### Previous offer accepted
+
+##### Posterior probabilities that outbidding rates are higher than chance
+
+```{r}
+nd_min <- m_raises_by_first$data %>% select(second_proposer_id, responder_id) %>% unique
+nd <- tibble(junk=1:(4*nrow(nd_min)))
+nd$session <- 7.5
+nd$previously_accepted <- +0.5
+nd$second_proposer_id <- rep(nd_min$second_proposer_id, 4)
+nd$responder_id <- rep(nd_min$responder_id, 4)
+nd$first_offer <- rep(1:4, each=nrow(nd_min))
+outbid_probs <- plogis(posterior_linpred(m_raises_by_first, newdata=nd))
+nd$above_chance <- colMeans(outbid_probs >= 0.5)
+nd_wide <- nd %>%
+	pivot_wider(id_cols=c("second_proposer_id", "responder_id"),
+		    names_from=first_offer, values_from=above_chance) %>%
+	rename(`Second proposer` = second_proposer_id,
+               `Responder` = responder_id) %>%
+	arrange(`Second proposer`, Responder)
+kable(nd_wide, digits=2)
+```
+
+##### Posterior probabilities that outbidding rates are above the estimated baseline
+
+```{r}
+nd <- left_join(nd, read_csv("raising_by_first_offer_preds.csv",
+			     show_col_types = FALSE) %>%
+		select(first_offer, baseline) %>% unique(), by="first_offer")
+nd$above_baseline <- colMeans(outbid_probs >= nd$baseline)
+nd_wide <- nd %>%
+	pivot_wider(id_cols=c("second_proposer_id", "responder_id"),
+		    names_from=first_offer, values_from=above_baseline) %>%
+	rename(`Second proposer` = second_proposer_id,
+               `Responder` = responder_id) %>%
+	arrange(`Second proposer`, Responder)
+kable(nd_wide, digits=2)
+```
+
+\newpage
+
+#### Previous offer rejected
+
+##### Posterior probabilities that outbidding rates are higher than chance
+
+```{r}
+nd_min <- m_raises_by_first$data %>% select(second_proposer_id, responder_id) %>% unique
+nd <- tibble(junk=1:(4*nrow(nd_min)))
+nd$session <- 7.5
+nd$previously_accepted <- -0.5
+nd$second_proposer_id <- rep(nd_min$second_proposer_id, 4)
+nd$responder_id <- rep(nd_min$responder_id, 4)
+nd$first_offer <- rep(1:4, each=nrow(nd_min))
+outbid_probs <- plogis(posterior_linpred(m_raises_by_first, newdata=nd))
+nd$above_chance <- colMeans(outbid_probs >= 0.5)
+nd_wide <- nd %>%
+	pivot_wider(id_cols=c("second_proposer_id", "responder_id"),
+		    names_from=first_offer, values_from=above_chance) %>%
+	rename(`Second proposer` = second_proposer_id,
+               `Responder` = responder_id) %>%
+	arrange(`Second proposer`, Responder)
+kable(nd_wide, digits=2)
+```
+
+##### Posterior probabilities that outbidding rates are above the estimated baseline
+
+```{r}
+nd <- left_join(nd, read_csv("raising_by_first_offer_preds.csv",
+			     show_col_types = FALSE) %>%
+		select(first_offer, baseline) %>% unique(), by="first_offer")
+nd$above_baseline <- colMeans(outbid_probs >= nd$baseline)
+nd_wide <- nd %>%
+	pivot_wider(id_cols=c("second_proposer_id", "responder_id"),
+		    names_from=first_offer, values_from=above_baseline) %>%
+	rename(`Second proposer` = second_proposer_id,
+               `Responder` = responder_id) %>%
+	arrange(`Second proposer`, Responder)
+kable(nd_wide, digits=2)
 ```
